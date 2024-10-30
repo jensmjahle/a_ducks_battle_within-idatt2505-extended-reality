@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d28380bbf8704542ab1fb9ec15cff51b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 182815
+  packageName: 2D Character - Duck
+  packageVersion: 2.0
+  assetPath: Assets/COPY SPRIGHT/Comic Battle Royale/2D Character - Duck/Variant
+    A/Animations/gun_walk_up.controller
+  uploadId: 624160

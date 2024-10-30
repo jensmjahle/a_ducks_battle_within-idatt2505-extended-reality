@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6f450b6fd2c74fd1a262c4bdf9e4ada4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 182815
+  packageName: 2D Character - Duck
+  packageVersion: 2.0
+  assetPath: Assets/COPY SPRIGHT/Comic Battle Royale/2D Character - Duck/Variant
+    E/Animations/idle_down.controller
+  uploadId: 624160

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cd7f11ef23b4472381cc43e27bdd9e6b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 182815
+  packageName: 2D Character - Duck
+  packageVersion: 2.0
+  assetPath: Assets/COPY SPRIGHT/Comic Battle Royale/2D Character - Duck/Variant
+    B/Animations/bomb_hold_up.controller
+  uploadId: 624160
