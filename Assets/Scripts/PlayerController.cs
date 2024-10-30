@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public Rigidbody2D rb;
+    public GameObject projectilePrefab;
+    public Transform firePoint;
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
     private float deceleration = 10f; // Speed to decrease when stopping
@@ -80,7 +82,14 @@ public class PlayerController : MonoBehaviour
 
     private void Fire(InputAction.CallbackContext context) 
     {
-
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        
+        Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+        if (rb != null) 
+        {
+            rb.linearVelocity = transform.right * projectile.GetComponent<Projectile>().speed;
+        }
+        
         Debug.Log("fired");
     }
 }
