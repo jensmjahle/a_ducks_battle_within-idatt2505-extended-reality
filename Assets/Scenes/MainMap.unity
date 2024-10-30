@@ -18938,7 +18938,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
-  moveSpeed: 5
+  maxSpeed: 10
+  acceleration: 10
+  deceleration: 10
 --- !u!4 &1701927688
 Transform:
   m_ObjectHideFlags: 0
