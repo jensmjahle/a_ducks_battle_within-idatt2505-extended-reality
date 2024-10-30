@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 87458408c43f4d11ba1b1b8041e96fba
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 182815
+  packageName: 2D Character - Duck
+  packageVersion: 2.0
+  assetPath: Assets/COPY SPRIGHT/Comic Battle Royale/2D Character - Duck/Variant
+    B/Animations/bomb_throw_side.controller
+  uploadId: 624160

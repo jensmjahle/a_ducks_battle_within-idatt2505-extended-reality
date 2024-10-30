@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6cefa9ee6b2f4695b415ba5d95de369f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 182815
+  packageName: 2D Character - Duck
+  packageVersion: 2.0
+  assetPath: Assets/COPY SPRIGHT/Comic Battle Royale/2D Character - Duck/Variant
+    D/Animations/run_up.controller
+  uploadId: 624160

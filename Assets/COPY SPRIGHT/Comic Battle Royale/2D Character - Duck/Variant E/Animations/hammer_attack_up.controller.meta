@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 65e074cf8724426585e3da2e8d896ed4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 182815
+  packageName: 2D Character - Duck
+  packageVersion: 2.0
+  assetPath: Assets/COPY SPRIGHT/Comic Battle Royale/2D Character - Duck/Variant
+    E/Animations/hammer_attack_up.controller
+  uploadId: 624160
