@@ -1,57 +1,86 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+
 public class PlayerController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public Rigidbody2D rb;
-    public float moveSpeed = 5f;
-    public PlayerInputActions playerControls;
+    private float maxSpeed = 10f;
+    private float acceleration = 10f; // Speed to increase to max speed
+    private float deceleration = 10f; // Speed to decrease when stopping
+    private PlayerInputActions playerControls;
 
-    Vector2 moveDirection = Vector2.zero;
+    private Vector2 moveDirection = Vector2.zero;
+    private Vector2 lookDirection = Vector2.zero;
+    private Vector2 currentVelocity = Vector2.zero;
 
     private InputAction move;
+    private InputAction look;
     private InputAction fire;
 
     private void Awake()
     {
-      playerControls = new PlayerInputActions();
+        playerControls = new PlayerInputActions();
     }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        rb.linearDamping = 0;
+        rb.angularDamping = 0;
     }
 
     private void OnEnable() 
     {
-      move = playerControls.Player.Move;
-      move.Enable();
+        move = playerControls.Player.Move;
+        move.Enable();
 
-      fire = playerControls.Player.Fire;
-      fire.Enable();
-      fire.performed += Fire;
+        fire = playerControls.Player.Fire;
+        fire.Enable();
+        fire.performed += Fire;
     }
 
     private void OnDisable()
     {
-      move.Disable();
-
-      fire.Disable();
+        move.Disable();
+        fire.Disable();
     }
 
-    // Update is called once per frame
     void Update()
     {
+        // Read the input direction each frame
         moveDirection = move.ReadValue<Vector2>();
+        lookDirection = look.ReadValue<Vector2>();
     }
 
     private void FixedUpdate()
     {
-      rb.linearVelocity = new Vector2(moveDirection.x * moveSpeed, moveDirection.y * moveSpeed);
+        // Determine the target velocity based on input and max speed
+        Vector2 targetVelocity = moveDirection * maxSpeed;
+
+        // Smoothly change current velocity based on acceleration or deceleration
+        if (moveDirection != Vector2.zero)
+        {
+            // Accelerate towards the target velocity
+            currentVelocity = Vector2.Lerp(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
+        }
+        else
+        {
+            // Decelerate to zero if there's no input
+            currentVelocity = Vector2.Lerp(currentVelocity, Vector2.zero, deceleration * Time.fixedDeltaTime);
+        }
+
+        // Apply the calculated velocity to the Rigidbody2D
+        rb.linearVelocity = currentVelocity;
+
+        Debug.Log("Current speed: " + currentVelocity.magnitude);
+        Debug.Log($"Current Speed: {currentVelocity.magnitude}, Target Speed: {targetVelocity.magnitude}");
+
     }
 
     private void Fire(InputAction.CallbackContext context) 
     {
-      Debug.Log("fired");
+
+        Debug.Log("fired");
     }
 }
