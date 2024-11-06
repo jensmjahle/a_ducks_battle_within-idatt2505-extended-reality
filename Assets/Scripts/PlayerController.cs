@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
     private float deceleration = 10f; // Speed to decrease when stopping
+    private bool isShooting = false;
+    private Coroutine shootingCoroutine;
     private PlayerInputActions playerControls;
 
     private Vector2 moveDirection = Vector2.zero;
@@ -37,6 +41,9 @@ public class PlayerController : MonoBehaviour
         move = playerControls.Player.Move;
         move.Enable();
 
+        look = playerControls.Player.Look;
+        look.Enable();
+
         fire = playerControls.Player.Fire;
         fire.Enable();
         fire.performed += Fire;
@@ -45,6 +52,7 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         move.Disable();
+        look.Disable();
         fire.Disable();
     }
 
@@ -52,7 +60,22 @@ public class PlayerController : MonoBehaviour
     {
         // Read the input direction each frame
         moveDirection = move.ReadValue<Vector2>();
-        lookDirection = look.ReadValue<Vector2>();
+        Vector2 newLookDirection = look.ReadValue<Vector2>();
+
+        if (newLookDirection != Vector2.zero)
+        {
+            lookDirection = newLookDirection.normalized;
+            if (!isShooting)
+            {
+                isShooting = true;
+                shootingCoroutine = StartCoroutine(ShootContinuously());
+            }
+        }
+        else
+        {
+            StopShooting();
+        }
+        Debug.Log("Lookdirection " + lookDirection);
     }
 
     private void FixedUpdate()
@@ -87,9 +110,53 @@ public class PlayerController : MonoBehaviour
         Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
         if (rb != null) 
         {
-            rb.linearVelocity = transform.right * projectile.GetComponent<Projectile>().speed;
+            rb.linearVelocity = lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
         }
         
         Debug.Log("fired");
     }
+
+    private void StartShooting(InputAction.CallbackContext context)
+    {
+      Vector2 input = context.ReadValue<Vector2>();
+      
+      if (input.x > 0) lookDirection = Vector2.right;    // L key
+      else if (input.x < 0) lookDirection = Vector2.left; // J key
+      else if (input.y > 0) lookDirection = Vector2.up;   // I key
+      else if (input.y < 0) lookDirection = Vector2.down; // K key
+
+      Debug.Log("Look direction " + lookDirection);
+      if (!isShooting)
+      {
+          isShooting = true;
+          shootingCoroutine = StartCoroutine(ShootContinuously());
+      }
+    }
+
+    private void StopShooting()
+    {
+        isShooting = false;
+        if (shootingCoroutine != null)
+        {
+            StopCoroutine(shootingCoroutine);
+            shootingCoroutine = null;
+        }
+    }
+
+    private IEnumerator ShootContinuously()
+    {
+        while (isShooting)
+        {
+            // Instantiate and shoot the projectile
+            GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+            Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
+            }
+
+            yield return new WaitForSeconds(0.2f); // Adjust the firing rate as needed
+        }
+    }
+
 }

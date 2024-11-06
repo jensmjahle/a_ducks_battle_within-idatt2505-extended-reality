@@ -11,12 +11,6 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
-    private void Update()
-    {
-        // Move the projectile forward based on its speed
-        transform.Translate(speed * Time.deltaTime * Vector2.right);
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         // Here, you can add logic for when the projectile hits something
