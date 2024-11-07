@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     private bool isShooting = false;
     private Coroutine shootingCoroutine;
     private PlayerInputActions playerControls;
+    private Animator animator;
 
     private Vector2 moveDirection = Vector2.zero;
     private Vector2 lookDirection = Vector2.zero;
@@ -34,6 +35,8 @@ public class PlayerController : MonoBehaviour
 
         rb.linearDamping = 0;
         rb.angularDamping = 0;
+
+        animator = GetComponent<Animator>();
     }
 
     private void OnEnable() 
@@ -76,6 +79,35 @@ public class PlayerController : MonoBehaviour
             StopShooting();
         }
         Debug.Log("Lookdirection " + lookDirection);
+
+        // Sjekk bevegelsesretning
+        Vector3 direction = moveDirection.normalized;
+
+        // Velg retning basert på den største komponenten
+        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+        {
+            // Bevegelse hovedsakelig horisontalt
+            animator.SetFloat("MoveX", Mathf.Abs(direction.x));
+            animator.SetFloat("MoveY", 0); // Nullstill Y for å unngå feilaktig animasjon
+
+            if (direction.x > 0)
+                transform.localScale = new Vector3(-1, 1, 1); // Speil på x-aksen
+            else
+                transform.localScale = new Vector3(1, 1, 1); // Normal retning
+        }
+        else
+        {
+            // Bevegelse hovedsakelig vertikalt
+            animator.SetFloat("MoveX", 0); // Nullstill X for å unngå feilaktig animasjon
+            animator.SetFloat("MoveY", direction.y);
+        }
+
+        // Hvis spilleren ikke beveger seg, sett animasjonen til 0
+        if (moveDirection == Vector2.zero)
+        {
+            animator.SetFloat("MoveX", 0);
+            animator.SetFloat("MoveY", 0);
+        }
     }
 
     private void FixedUpdate()
