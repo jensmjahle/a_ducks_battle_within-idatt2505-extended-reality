@@ -28,40 +28,37 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    /*
-    void Update()
-    {
-        if (player != null)
-        {
-            agent.SetDestination(player.position);
-        }
-    }
-    */
+ 
     void Update()
     {
         if (player != null)
         {
             agent.SetDestination(player.position);
 
-            // Sjekk bevegelsesretning
+            // Check movement direction
             Vector3 direction = agent.velocity.normalized;
 
-            // Velg retning basert på den største komponenten
+            // Choose animation based on direction
             if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
             {
-                // Bevegelse hovedsakelig horisontalt
+                // Movement mainly horizontal
                 animator.SetFloat("MoveX", Mathf.Abs(direction.x));
-                animator.SetFloat("MoveY", 0); // Nullstill Y for å unngå feilaktig animasjon
+                animator.SetFloat("MoveY", 0);
 
-                if (direction.x > 0)
-                    transform.localScale = new Vector3(-1, 1, 1); // Speil på x-aksen
-                else
-                    transform.localScale = new Vector3(1, 1, 1); // Normal retning
+                if (direction.magnitude > 0.2f) // Avoid flickering when standing still
+                {
+
+                    if (direction.x > 0)
+                        transform.localScale = new Vector3(-1, 1, 1); // Flip sprite
+                    else
+                        transform.localScale = new Vector3(1, 1, 1); // Normal sprite
+
+                }
             }
             else
             {
-                // Bevegelse hovedsakelig vertikalt
-                animator.SetFloat("MoveX", 0); // Nullstill X for å unngå feilaktig animasjon
+                // Movement mainly vertical
+                animator.SetFloat("MoveX", 0);
                 animator.SetFloat("MoveY", direction.y);
             }
         }
