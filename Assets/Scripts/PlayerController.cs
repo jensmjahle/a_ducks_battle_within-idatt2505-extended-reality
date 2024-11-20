@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour
 
         fire = playerControls.Player.Fire;
         fire.Enable();
-        fire.performed += Fire;
+        fire.performed += OnFirePerformed;
     }
 
     private void OnDisable()
@@ -79,27 +79,26 @@ public class PlayerController : MonoBehaviour
         {
             StopShooting();
         }
-        Debug.Log("Lookdirection " + lookDirection);
 
         // Sjekk bevegelsesretning
         Vector3 direction = moveDirection.normalized;
 
-        // Velg retning basert på den største komponenten
+        // Velg retning basert pï¿½ den stï¿½rste komponenten
         if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
         {
             // Bevegelse hovedsakelig horisontalt
             animator.SetFloat("MoveX", Mathf.Abs(direction.x));
-            animator.SetFloat("MoveY", 0); // Nullstill Y for å unngå feilaktig animasjon
+            animator.SetFloat("MoveY", 0); // Nullstill Y for ï¿½ unngï¿½ feilaktig animasjon
 
             if (direction.x > 0)
-                transform.localScale = new Vector3(-1, 1, 1); // Speil på x-aksen
+                transform.localScale = new Vector3(-1, 1, 1); // Speil pï¿½ x-aksen
             else
                 transform.localScale = new Vector3(1, 1, 1); // Normal retning
         }
         else
         {
             // Bevegelse hovedsakelig vertikalt
-            animator.SetFloat("MoveX", 0); // Nullstill X for å unngå feilaktig animasjon
+            animator.SetFloat("MoveX", 0); // Nullstill X for ï¿½ unngï¿½ feilaktig animasjon
             animator.SetFloat("MoveY", direction.y);
         }
 
@@ -131,23 +130,33 @@ public class PlayerController : MonoBehaviour
         // Apply the calculated velocity to the Rigidbody2D
         rb.linearVelocity = currentVelocity;
 
-        Debug.Log("Current speed: " + currentVelocity.magnitude);
-        Debug.Log($"Current Speed: {currentVelocity.magnitude}, Target Speed: {targetVelocity.magnitude}");
-
+        
     }
 
-    private void Fire(InputAction.CallbackContext context) 
-    {
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-        
-        Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-        if (rb != null) 
-        {
-            rb.linearVelocity = lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
-        }
-        
-        Debug.Log("fired");
-    }
+    // Wrapper method to match the required signature
+  private void OnFirePerformed(InputAction.CallbackContext context)
+  {
+      Fire(); // Call the actual firing logic
+  }
+
+      private void Fire()
+  {
+      // Instantiate the projectile
+      GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+
+      // Calculate the angle and set the rotation
+      float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
+      projectile.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 180));
+
+
+      // Apply velocity to the projectile
+      Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+      if (rb != null)
+      {
+          rb.linearVelocity = lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
+      }
+  }
+
 
     private void StartShooting(InputAction.CallbackContext context)
     {
@@ -158,7 +167,6 @@ public class PlayerController : MonoBehaviour
       else if (input.y > 0) lookDirection = Vector2.up;   // I key
       else if (input.y < 0) lookDirection = Vector2.down; // K key
 
-      Debug.Log("Look direction " + lookDirection);
       if (!isShooting)
       {
           isShooting = true;
@@ -180,13 +188,7 @@ public class PlayerController : MonoBehaviour
     {
         while (isShooting)
         {
-            // Instantiate and shoot the projectile
-            GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
-            Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.linearVelocity = lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
-            }
+            Fire();
 
             yield return new WaitForSeconds(0.2f); // Adjust the firing rate as needed
         }

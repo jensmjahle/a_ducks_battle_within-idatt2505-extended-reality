@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    public int health;
+    private int health = 100;
     public float speed;
     private Transform player;
     private NavMeshAgent agent;
