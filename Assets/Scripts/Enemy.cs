@@ -25,10 +25,21 @@ public class Enemy : MonoBehaviour
         health -= damage;
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
     }
- 
+
+
+    private void Die()
+    {
+        // Notify the GameManager
+        GameManager.Instance.OnEnemyDefeated();
+
+        // Destroy this enemy
+        Destroy(gameObject);
+    }
+
+
     void Update()
     {
         if (player != null)
