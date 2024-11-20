@@ -3,39 +3,94 @@ using System.Collections;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;  // Drag enemy prefab her i Inspector
-    public Transform player;         // Referanse til spilleren
-    public float spawnDelay = 2f;   // Tiden mellom spawns
-    public int enemiesPerWave = 5;  // Antall fiender per bølge
-    public float spawnDistance = 10f; // Avstand fra spilleren hvor fiender skal spawne
-    private int currentWave = 0;
+    public GameObject enemyPrefab;
+    public Transform player;
+    public float spawnDelay = 1f;
 
-    void Start()
+    private void Start()
     {
         StartCoroutine(SpawnEnemies());
     }
 
     IEnumerator SpawnEnemies()
     {
-        while (true) // Infinite loop, kan endres til en betingelse for å stoppe spawning
+        while (true)
         {
-            currentWave++;
-            for (int i = 0; i < enemiesPerWave; i++)
+            if (GameManager.Instance.CanSpawnEnemy())
             {
                 SpawnEnemy();
                 yield return new WaitForSeconds(spawnDelay);
             }
-            yield return new WaitForSeconds(5f); // Vent før neste bølge
+            else
+            {
+                yield return null; // Wait until enemies can be spawned.
+            }
+        }
+    }
+ 
+
+void SpawnEnemy()
+{
+    Vector3 spawnPosition = Vector3.zero;
+    bool validPosition = false;
+    GameObject enemy = null; // Ensure this is declared before the loop to be accessible after the loop
+
+    while (!validPosition)
+    {
+        try
+        {
+            // Generate a random direction in the XY plane (no vertical movement)
+            Vector3 randomDirection = Random.insideUnitCircle.normalized;
+
+            // Scale the direction to the desired spawn distance
+            spawnPosition = player.position + new Vector3(randomDirection.x * 30, randomDirection.y * 30, 0);
+
+            // Log the player's position and the spawn position
+            Debug.Log($"Player Position: {player.position}");
+            Debug.Log($"Enemy Spawn Position: {spawnPosition}");
+
+            // Check if the spawn position is on the NavMesh
+            UnityEngine.AI.NavMeshHit hit;
+            if (UnityEngine.AI.NavMesh.SamplePosition(spawnPosition, out hit, 10f, UnityEngine.AI.NavMesh.AllAreas))
+            {
+                // If the position is valid, instantiate the enemy at the found point on the NavMesh
+                spawnPosition = hit.position;
+                enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+
+                validPosition = true; // Valid position found
+            }
+            else
+            {
+                // If the position is not valid, retry the loop and choose a new position
+                Debug.LogWarning("Invalid spawn position. Retrying...");
+            }
+        }
+        catch (System.Exception e)
+        {
+            // Catch any unexpected errors
+            Debug.LogError($"Error spawning enemy: {e.Message}");
+            break; // Optionally break the loop if you want to stop retrying on error
         }
     }
 
-    void SpawnEnemy()
+    if (enemy != null)
     {
-        // Velg en random posisjon rundt spilleren
-        Vector3 spawnPosition = player.position + Random.onUnitSphere * spawnDistance;
-        spawnPosition.y = 0; // Sett Y-aksen til 0 for å unngå problemer med høyde
+        // Notify the GameManager that an enemy has spawned
+        GameManager.Instance.OnEnemySpawned();
 
-        // Instansier fienden
-        Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        // Optionally scale the enemy's health based on the round
+        var enemyScript = enemy.GetComponent<Enemy>();
+        if (enemyScript != null)
+        {
+            // enemyScript.SetHealth(GameManager.Instance.currentRound);
+        }
     }
 }
+
+
+
+
+
+
+}
+
