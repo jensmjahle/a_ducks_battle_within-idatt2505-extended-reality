@@ -11,7 +11,10 @@ public class GameManager : MonoBehaviour
     public int currentRound = 1;
     public int enemiesPerRound = 10;
     public int maxEnemies = 25;
-    public Text roundText; 
+    public Text roundText;
+    public Text score;
+    public int scoreValue = 0;
+    public int totEnemiesKilled = 0;
 
     private int enemiesSpawned = 0;
     private int enemiesDefeated = 0;
@@ -35,6 +38,8 @@ public class GameManager : MonoBehaviour
     public void OnEnemyDefeated()
     {
         enemiesDefeated++;
+        UpdateScore(10); // Update the score when an enemy is defeated
+        totEnemiesKilled++;
         if (enemiesDefeated >= enemiesPerRound)
         {
             StartCoroutine(WaitBeforeNextRound()); // Start the coroutine to wait before next round
@@ -59,6 +64,13 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(FadeRoundText());
         }
+    }
+
+    public void UpdateScore(int value)
+    {
+        if (score == null) return; // Check if the score text is assigned
+        scoreValue += value;
+        score.text = $"Score: {scoreValue}";
     }
 
     private IEnumerator WaitBeforeNextRound()
