@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public Rigidbody2D rb;
     public GameObject projectilePrefab;
+
     public Transform firePoint;
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
