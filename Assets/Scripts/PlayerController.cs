@@ -7,15 +7,20 @@ public class PlayerController : MonoBehaviour
 {
     public Rigidbody2D rb;
     public GameObject projectilePrefab;
-
     public Transform firePoint;
+
+    // Prefab management
+    public GameObject currentPlayerPrefab;
+    private GameObject activePlayerInstance;
+    private Animator animator;
+
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
     private float deceleration = 10f; // Speed to decrease when stopping
     private bool isShooting = false;
     private Coroutine shootingCoroutine;
     private PlayerInputActions playerControls;
-    private Animator animator;
+    
 
     private Vector2 moveDirection = Vector2.zero;
     private Vector2 lookDirection = Vector2.zero;
@@ -32,12 +37,24 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        if (currentPlayerPrefab == null)
+        {
+            Debug.LogError("No player prefab assigned!");
+            return;
+        }
+        SwapPrefab(currentPlayerPrefab);
+
         rb = GetComponent<Rigidbody2D>();
 
         rb.linearDamping = 0;
         rb.angularDamping = 0;
 
         animator = GetComponent<Animator>();
+        animator.SetFloat("PlayerColor", 0);
+         animator.SetFloat("WeaponType", 1);
+
+
+
     }
 
     private void OnEnable() 
@@ -157,6 +174,22 @@ public class PlayerController : MonoBehaviour
       }
   }
 
+
+    public void SwapPrefab(GameObject newPrefab)
+    {
+        if (activePlayerInstance != null)
+        {
+            Destroy(activePlayerInstance);
+        }
+
+        // Instantiate the new prefab
+        activePlayerInstance = Instantiate(newPrefab, transform.position, Quaternion.identity, transform);
+        animator = activePlayerInstance.GetComponent<Animator>();
+        rb = activePlayerInstance.GetComponent<Rigidbody2D>();
+
+        // Ensure the instance syncs with current settings
+        activePlayerInstance.transform.localPosition = Vector3.zero;
+    }
 
     private void StartShooting(InputAction.CallbackContext context)
     {
