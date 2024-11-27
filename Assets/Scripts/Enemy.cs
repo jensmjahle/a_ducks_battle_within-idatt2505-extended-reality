@@ -4,10 +4,15 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     private int health = 100;
-    public float speed;
+    public float speed = 9;
+    public int damageToPlayer = 2; // Damage dealt to the player
+    public float damageInterval = 0.5f; // Time between damage ticks
+    private float damageTimer = 0f; // Tracks time since last damage
+
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
+    private bool isTouchingPlayer = false; // Tracks if colliding with the player
 
     void Start()
     {
@@ -29,7 +34,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-
     private void Die()
     {
         // Notify the GameManager
@@ -39,9 +43,25 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
-
     void Update()
     {
+        // Periodically deal damage if touching the player
+        if (isTouchingPlayer)
+        {
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= damageInterval)
+            {
+                damageTimer = 0f; // Reset the timer
+
+                // Deal damage to the player
+                HealthManager playerHealth = player.GetComponent<HealthManager>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(damageToPlayer);
+                }
+            }
+        }
+
         if (player != null)
         {
             agent.SetDestination(player.position);
@@ -72,6 +92,23 @@ public class Enemy : MonoBehaviour
                 animator.SetFloat("MoveX", 0);
                 animator.SetFloat("MoveY", direction.y);
             }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision) // Or OnTriggerEnter for 3D
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isTouchingPlayer = true; // Start the damage timer
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision) // Or OnTriggerExit for 3D
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isTouchingPlayer = false; // Stop dealing damage
+            damageTimer = 0f; // Reset the timer
         }
     }
 }
