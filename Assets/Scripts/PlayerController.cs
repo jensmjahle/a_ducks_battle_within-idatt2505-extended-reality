@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour
     // Prefab management
     public GameObject currentPlayerPrefab;
     private GameObject activePlayerInstance;
+    private Animator baseAnimator; // The base animator (always running)
+    private Animator[] overlayAnimators; // Array to store overlay animators (can be 1 or 2)
+
+
     private Animator animator;
 
     private float maxSpeed = 10f;
@@ -37,10 +41,15 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        if (currentPlayerPrefab == null)
+        // Find the base animator (which always runs)
+        if (currentPlayerPrefab != null)
         {
-            Debug.LogError("No player prefab assigned!");
-            return;
+            baseAnimator = currentPlayerPrefab.GetComponentInChildren<Animator>(); // Find base animator in child objects
+            // Find all child animators and store them (overlay or second overlay)
+            overlayAnimators = currentPlayerPrefab.GetComponentsInChildren<Animator>();
+
+            // Filter out the base animator from the overlay animators (assuming only one animator is for the base)
+            overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator);
         }
         SwapPrefab(currentPlayerPrefab);
 
@@ -53,7 +62,13 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("PlayerColor", 0);
          animator.SetFloat("WeaponType", 1);
 
-
+        // Debugging: Print out the base animator and overlay animators
+        Debug.Log("Base Animator: " + baseAnimator.name);
+        Debug.Log("Overlay Animators:");
+        foreach (var overlayAnimator in overlayAnimators)
+        {
+            Debug.Log(" - " + overlayAnimator.name);
+        }
 
     }
 
@@ -95,6 +110,20 @@ public class PlayerController : MonoBehaviour
         else
         {
             StopShooting();
+        }
+
+        // Example: When pressing "1", turn on all overlay animators
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SetOverlayActive(true);
+            Debug.Log("Button pressed Overlay animators enabled");
+        }
+
+        // Example: When pressing "2", turn off all overlay animators
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SetOverlayActive(false);
+            Debug.Log("Button pressed Overlay animators disabled");
         }
 
         // Sjekk bevegelsesretning
@@ -150,8 +179,24 @@ public class PlayerController : MonoBehaviour
         
     }
 
+
+    // Method to enable or disable overlay animators. This activates or deactivates the firing animation.
+    public void SetOverlayActive(bool isActive)
+    {
+        foreach (var overlayAnimator in overlayAnimators)
+        {
+            if (overlayAnimator != null)
+            {
+                Debug.Log("Before setting, Animator enabled: " + overlayAnimator.enabled);
+                overlayAnimator.enabled = isActive;
+                Start();
+                Debug.Log("After setting, Animator enabled: " + overlayAnimator.enabled);
+            }
+        }
+    }
+
     // Wrapper method to match the required signature
-  private void OnFirePerformed(InputAction.CallbackContext context)
+    private void OnFirePerformed(InputAction.CallbackContext context)
   {
       Fire(); // Call the actual firing logic
   }
