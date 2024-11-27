@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// GameManager class to manage the game state. This class will handle the rounds, score, and enemies.
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -15,26 +16,29 @@ public class GameManager : MonoBehaviour
     public Text score;
     public int scoreValue = 0;
     public int totEnemiesKilled = 0;
-
     private int enemiesSpawned = 0;
     private int enemiesDefeated = 0;
 
+    // Singleton pattern
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
 
+    // Start is called before the first frame update
     private void Start()
     {
         UpdateRoundText();
     }
 
+    // Called when an enemy is spawned. Increment the counter
     public void OnEnemySpawned()
     {
         enemiesSpawned++;
     }
 
+    // Called when an enemy is defeated. Update the score and check if the round is complete
     public void OnEnemyDefeated()
     {
         enemiesDefeated++;
@@ -46,6 +50,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Start the next round by incrementing the enemies per round and resetting the counters
     private void StartNextRound()
     {
         enemiesPerRound += 5; // Increment enemies per round.
@@ -53,7 +58,8 @@ public class GameManager : MonoBehaviour
         enemiesDefeated = 0;
     }
 
- 
+
+    // Update the round text
     private void UpdateRoundText()
     {
         if (roundText != null && currentRound == 1)
@@ -66,6 +72,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Update the score text
     public void UpdateScore(int value)
     {
         if (score == null) return; // Check if the score text is assigned
@@ -73,6 +80,7 @@ public class GameManager : MonoBehaviour
         score.text = $"Score: {scoreValue}";
     }
 
+    // Coroutine to wait before starting the next round
     private IEnumerator WaitBeforeNextRound()
     {
         currentRound++;
@@ -82,11 +90,13 @@ public class GameManager : MonoBehaviour
         StartNextRound();
     }
 
+    // Check if enemies can be spawned
     public bool CanSpawnEnemy()
     {
         return enemiesSpawned < maxEnemies && enemiesSpawned < enemiesPerRound;
     }
 
+    // Coroutine to fade the round text in and out
     private IEnumerator FadeRoundText()
     {
         float totalDuration = 6f; // Total time for the effect
