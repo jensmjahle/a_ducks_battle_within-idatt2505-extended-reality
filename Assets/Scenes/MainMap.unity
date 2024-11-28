@@ -1768,63 +1768,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &320809179
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 320809180}
-  - component: {fileID: 320809181}
-  m_Layer: 0
-  m_Name: PlayerPrefabManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &320809180
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 320809179}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.779673, y: -2.5594466, z: 2.8604956}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1701927688}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &320809181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 320809179}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36c915203d7a949498e6f9639c1873f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerPrefabs:
-  - prefab: {fileID: 4257746298942446290, guid: 8ee3d207b930475f9575c5080372c219, type: 3}
-    weaponType: 1
-    colorVariant: 0
-    direction: 2
-  - prefab: {fileID: 8414878804345282934, guid: f9f27e186d814a34b77732fa70fdcb3e, type: 3}
-    weaponType: 1
-    colorVariant: 0
-    direction: 0
-  - prefab: {fileID: 4585321652342069593, guid: 734bc2ef01a145b39544deb48c23a183, type: 3}
-    weaponType: 1
-    colorVariant: 0
-    direction: 1
 --- !u!1 &414770312
 GameObject:
   m_ObjectHideFlags: 0
@@ -19761,6 +19704,7 @@ GameObject:
   - component: {fileID: 1701927686}
   - component: {fileID: 1701927689}
   - component: {fileID: 1701927690}
+  - component: {fileID: 1701927691}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -19826,7 +19770,6 @@ Transform:
   m_Children:
   - {fileID: 593792217}
   - {fileID: 1670769000}
-  - {fileID: 320809180}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &1701927689
@@ -19888,6 +19831,43 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1701927691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1701927683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36c915203d7a949498e6f9639c1873f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPrefabs:
+  - prefab: {fileID: 4257746298942446290, guid: 8ee3d207b930475f9575c5080372c219, type: 3}
+    weaponType: 1
+    colorVariant: 0
+    direction: 2
+  - prefab: {fileID: 8414878804345282934, guid: f9f27e186d814a34b77732fa70fdcb3e, type: 3}
+    weaponType: 1
+    colorVariant: 0
+    direction: 0
+  - prefab: {fileID: 4585321652342069593, guid: 734bc2ef01a145b39544deb48c23a183, type: 3}
+    weaponType: 1
+    colorVariant: 0
+    direction: 1
+  - prefab: {fileID: 7289248543925582162, guid: b065a4ced5a04a3b8ca6fbc7c0154d4f, type: 3}
+    weaponType: 1
+    colorVariant: 0
+    direction: 5
+  - prefab: {fileID: 3912641673502032632, guid: 97a9e66257fc42c595ee40d011e36f57, type: 3}
+    weaponType: 1
+    colorVariant: 0
+    direction: 3
+  - prefab: {fileID: 4375054338545333253, guid: bc2f7c8b9439498ba70862b74462869d, type: 3}
+    weaponType: 1
+    colorVariant: 0
+    direction: 4
 --- !u!1 &1763259956
 GameObject:
   m_ObjectHideFlags: 0

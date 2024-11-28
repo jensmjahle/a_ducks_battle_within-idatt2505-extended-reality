@@ -16,12 +16,17 @@ public class PlayerController : MonoBehaviour
     private Animator[] overlayAnimators; // Array to store overlay animators (can be 1 or 2)
 
 
-    private Animator animator;
+    private PlayerPrefabManager prefabManager;
+
 
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
     private float deceleration = 10f; // Speed to decrease when stopping
     private bool isShooting = false;
+    private ColorVariant currentColorVariant;
+    private WeaponType currentWeaponType;
+    private string currentDirection = "down"; // "left", "right", "up", "down"
+    private bool isMoving = false;
     private Coroutine shootingCoroutine;
     private PlayerInputActions playerControls;
     
@@ -41,6 +46,13 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+
+        prefabManager = prefabManager = GetComponent<PlayerPrefabManager>();
+
+        currentColorVariant = ColorVariant.A; // Set the default color variant
+        currentWeaponType = WeaponType.Pistol; // Set the default weapon type
+      
+
         // Find the base animator (which always runs)
         if (currentPlayerPrefab != null)
         {
@@ -51,24 +63,13 @@ public class PlayerController : MonoBehaviour
             // Filter out the base animator from the overlay animators (assuming only one animator is for the base)
             overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator);
         }
-        SwapPrefab(currentPlayerPrefab);
+        // Initialize the player prefab
+        SwapPrefab();
 
         rb = GetComponent<Rigidbody2D>();
 
         rb.linearDamping = 0;
         rb.angularDamping = 0;
-
-        animator = GetComponent<Animator>();
-        animator.SetFloat("PlayerColor", 0);
-         animator.SetFloat("WeaponType", 1);
-
-        // Debugging: Print out the base animator and overlay animators
-        Debug.Log("Base Animator: " + baseAnimator.name);
-        Debug.Log("Overlay Animators:");
-        foreach (var overlayAnimator in overlayAnimators)
-        {
-            Debug.Log(" - " + overlayAnimator.name);
-        }
 
     }
 
@@ -112,29 +113,15 @@ public class PlayerController : MonoBehaviour
             StopShooting();
         }
 
-        // Example: When pressing "1", turn on all overlay animators
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SetOverlayActive(true);
-            Debug.Log("Button pressed Overlay animators enabled");
-        }
-
-        // Example: When pressing "2", turn off all overlay animators
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SetOverlayActive(false);
-            Debug.Log("Button pressed Overlay animators disabled");
-        }
-
-        // Sjekk bevegelsesretning
-        Vector3 direction = moveDirection.normalized;
+        // Calculate the direction of movement
+        Vector3 direction = lookDirection.normalized;
 
         // Velg retning basert p� den st�rste komponenten
         if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
         {
             // Bevegelse hovedsakelig horisontalt
-            animator.SetFloat("MoveX", Mathf.Abs(direction.x));
-            animator.SetFloat("MoveY", 0); // Nullstill Y for � unng� feilaktig animasjon
+           // animator.SetFloat("MoveX", Mathf.Abs(direction.x));
+            //animator.SetFloat("MoveY", 0); // Nullstill Y for � unng� feilaktig animasjon
 
             if (direction.x > 0)
                 transform.localScale = new Vector3(-1, 1, 1); // Speil p� x-aksen
@@ -144,15 +131,13 @@ public class PlayerController : MonoBehaviour
         else
         {
             // Bevegelse hovedsakelig vertikalt
-            animator.SetFloat("MoveX", 0); // Nullstill X for � unng� feilaktig animasjon
-            animator.SetFloat("MoveY", direction.y);
+            // call the prefab change here for the player
         }
 
         // Hvis spilleren ikke beveger seg, sett animasjonen til 0
         if (moveDirection == Vector2.zero)
         {
-            animator.SetFloat("MoveX", 0);
-            animator.SetFloat("MoveY", 0);
+            // call idle animation here
         }
     }
 
@@ -189,7 +174,7 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Before setting, Animator enabled: " + overlayAnimator.enabled);
                 overlayAnimator.enabled = isActive;
-                Start();
+                Start(); // Not a good practice, but for mvp
                 Debug.Log("After setting, Animator enabled: " + overlayAnimator.enabled);
             }
         }
@@ -220,30 +205,97 @@ public class PlayerController : MonoBehaviour
   }
 
 
-    public void SwapPrefab(GameObject newPrefab)
+    public void SwapPrefab()
     {
-        if (activePlayerInstance != null)
+        if (prefabManager == null)
         {
-            Destroy(activePlayerInstance);
+            Debug.LogError("PlayerPrefabManager is not assigned to the PlayerController.");
+            return;
         }
 
-        // Instantiate the new prefab
-        activePlayerInstance = Instantiate(newPrefab, transform.position, Quaternion.identity, transform);
-        animator = activePlayerInstance.GetComponent<Animator>();
-        rb = activePlayerInstance.GetComponent<Rigidbody2D>();
+        // Use the current weapon type and color variant to select the appropriate prefab
+        WeaponType currentWeapon = currentWeaponType;   
+        ColorVariant currentColor = currentColorVariant;
+        PlayerDirection newDirection;
 
-        // Ensure the instance syncs with current settings
-        activePlayerInstance.transform.localPosition = Vector3.zero;
+        if (currentDirection == "left")
+        {
+            if (isMoving)
+            {
+                newDirection = PlayerDirection.Side_Walk;
+            }
+            else
+            {
+                newDirection = PlayerDirection.Side_Idle;
+            }
+        } else if (currentDirection == "right") {
+            if (isMoving) {
+                newDirection = PlayerDirection.Side_Walk;
+            }
+            else
+            {
+                newDirection = PlayerDirection.Side_Idle;
+            }
+        }
+        else if (currentDirection == "up")
+        {
+            if (isMoving)
+            {
+                newDirection = PlayerDirection.Up_Walk;
+            }
+            else
+            {
+                newDirection = PlayerDirection.Up_Idle;
+            }
+        }
+        else if (currentDirection == "down")
+        {
+            if (isMoving)
+            {
+                newDirection = PlayerDirection.Down_Walk;
+            }
+            else
+            {
+                newDirection = PlayerDirection.Down_Idle;
+            }
+        
+        }
+        else 
+        {
+                newDirection = PlayerDirection.Side_Idle;
+                Debug.LogError("Invalid direction: " + currentDirection);
+        }
+
+
+
+
+            Debug.Log("Current weapon: " + currentWeapon + ", Current color: " + currentColor + ", Direction: " + newDirection);
+
+        // Call the prefab manager to swap the prefab
+        prefabManager.SwapPrefab(currentWeapon, currentColor, newDirection);
     }
 
     private void StartShooting(InputAction.CallbackContext context)
     {
-      Vector2 input = context.ReadValue<Vector2>();
-      
-      if (input.x > 0) lookDirection = Vector2.right;    // L key
-      else if (input.x < 0) lookDirection = Vector2.left; // J key
-      else if (input.y > 0) lookDirection = Vector2.up;   // I key
-      else if (input.y < 0) lookDirection = Vector2.down; // K key
+        SetOverlayActive(true); // Enable the firing overlay animation
+
+        Vector2 input = context.ReadValue<Vector2>();
+        if (input.x > 0)
+        {
+            lookDirection = Vector2.right;    // L key
+        }
+        else if (input.x < 0)
+        {
+            lookDirection = Vector2.left; // J key
+        }
+        else if (input.y > 0)
+        {
+            lookDirection = Vector2.up;   // I key
+        }
+        else if (input.y < 0)
+        {
+            lookDirection = Vector2.down; // K key
+        }
 
       if (!isShooting)
       {
@@ -254,6 +306,7 @@ public class PlayerController : MonoBehaviour
 
     private void StopShooting()
     {
+        SetOverlayActive(false); // Disable the firing overlay animation
         isShooting = false;
         if (shootingCoroutine != null)
         {
