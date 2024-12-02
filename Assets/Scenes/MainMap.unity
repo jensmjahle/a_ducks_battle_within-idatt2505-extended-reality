@@ -19845,6 +19845,30 @@ MonoBehaviour:
     weaponType: 1
     colorVariant: 0
     direction: 4
+  - prefab: {fileID: 3781625300802531157, guid: 784f8e74851742b4b89c4984715208f9, type: 3}
+    weaponType: 3
+    colorVariant: 0
+    direction: 2
+  - prefab: {fileID: 3803738606609729014, guid: de2870df6dd647ca8169341dc90f5724, type: 3}
+    weaponType: 3
+    colorVariant: 0
+    direction: 0
+  - prefab: {fileID: 5107202914049814876, guid: a15723db0b9642fe879b16f328098a16, type: 3}
+    weaponType: 3
+    colorVariant: 0
+    direction: 1
+  - prefab: {fileID: 347709437670123145, guid: 7a818430339c4fc598e01f78d0984053, type: 3}
+    weaponType: 3
+    colorVariant: 0
+    direction: 5
+  - prefab: {fileID: 463170588979356612, guid: da492824fcce4c149c186765dcc5afdb, type: 3}
+    weaponType: 3
+    colorVariant: 0
+    direction: 3
+  - prefab: {fileID: 4296188339126442442, guid: c50d1d15257e4728a2bc9a010de46241, type: 3}
+    weaponType: 3
+    colorVariant: 0
+    direction: 4
 --- !u!1 &1763259956
 GameObject:
   m_ObjectHideFlags: 0

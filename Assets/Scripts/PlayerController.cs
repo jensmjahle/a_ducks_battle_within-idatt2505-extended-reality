@@ -118,18 +118,7 @@ public class PlayerController : MonoBehaviour
         _currentWeaponType = WeaponType.Pistol; // Set the default weapon type
         _lookDirection = Vector2.down; // Set the default look direction
 
-        //currentPlayerPrefab = prefabManager.SwapPrefab(currentWeaponType, currentColorVariant, PlayerDirection.Down_Idle);
-
         SwapPrefab(); // Swap the prefab based on the initial values
-   
-
-
-       
-
-        SetOverlayActive(); // Enable or disable the overlay animators based on the initial shooting state
-
-                            // Initialize the player prefab
-                            //  SetOverlayActive(false); // Disable the overlay animators by default
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -181,16 +170,13 @@ public class PlayerController : MonoBehaviour
             if (!_isShooting)
             {
                 IsShooting = true;
-               // SetOverlayActive(true); // Enable the firing overlay animation
-              //  Debug.Log("Start shooting");
                 shootingCoroutine = StartCoroutine(ShootContinuously());
             }
         }
         else
         {
             StopShooting();
-           // SetOverlayActive(false); // Disable the firing overlay animation
-          //  Debug.Log("Stop shooting");
+          
         }
 
         // Set the movement state
@@ -234,7 +220,18 @@ public class PlayerController : MonoBehaviour
         {
             if (overlayAnimator != null)
             {
-                overlayAnimator.enabled = _isShooting;
+                // Completely disable/hide the overlay animator if it's a muzzle flash
+                // Otherwise, just enable or disable the animator
+                if (overlayAnimator.name.Contains("muzzle_flash"))
+                {
+                    overlayAnimator.gameObject.SetActive(_isShooting);
+                } else
+                {
+                    overlayAnimator.enabled = _isShooting;
+                }
+
+                // overlayAnimator.enabled = _isShooting;
+                //overlayAnimator.gameObject.SetActive(_isShooting);
                 Debug.Log("Overlay animator enabled: " + _isShooting);
                 Debug.Log("Overlay animator name: " + overlayAnimator.name);
                 Debug.Log("Firing " + _isShooting);
