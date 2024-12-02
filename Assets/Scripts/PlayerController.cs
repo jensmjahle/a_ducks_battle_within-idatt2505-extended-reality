@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,23 +8,101 @@ public class PlayerController : MonoBehaviour
 {
     public Rigidbody2D rb;
     public GameObject projectilePrefab;
-
     public Transform firePoint;
+
+    // Prefab management
+    public GameObject currentPlayerPrefab;
+    private GameObject activePlayerInstance;
+    private Animator baseAnimator; // The base animator (always running)
+    private Animator[] overlayAnimators; // Array to store overlay animators (can be 1 or 2)
+
+
+    private PlayerPrefabManager prefabManager;
+
+
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
     private float deceleration = 10f; // Speed to decrease when stopping
-    private bool isShooting = false;
+   
+    private bool isFacingRight = false;
+    private ColorVariant currentColorVariant;
     private Coroutine shootingCoroutine;
     private PlayerInputActions playerControls;
-    private Animator animator;
+    
 
     private Vector2 moveDirection = Vector2.zero;
-    private Vector2 lookDirection = Vector2.zero;
+   // private Vector2 lookDirection = Vector2.zero;
     private Vector2 currentVelocity = Vector2.zero;
 
     private InputAction move;
     private InputAction look;
     private InputAction fire;
+
+
+    // Events to notify when a value changes
+    public event Action OnShootingChanged;
+    public event Action OnMovementChanged;
+    public event Action OnLookDirectionChanged;
+    public event Action OnWeaponChanged;
+
+
+    // Properties to encapsulate the state and notify listeners when a change occurs
+    private bool _isShooting = false;
+    public bool IsShooting
+    {
+        get => _isShooting;
+        set
+        {
+            if (_isShooting != value)
+            {
+                _isShooting = value;
+                OnShootingChanged?.Invoke(); // Notify listeners when movement state changes
+            }
+        }
+    }
+    private bool _isMoving = false;
+    public bool IsMoving
+    {
+        get => _isMoving;
+        set
+        {
+            if (_isMoving != value)
+            {
+                _isMoving = value;
+                OnMovementChanged?.Invoke(); // Notify listeners when movement state changes
+            }
+        }
+    }
+    private Vector2 _lookDirection = Vector2.zero;
+    public Vector2 LookDirection
+    {
+        get => _lookDirection;
+        set
+        {
+            if (_lookDirection != value)
+            {
+                Debug.Log("Look direction changed: " + value);
+                _lookDirection = value;
+                OnLookDirectionChanged?.Invoke(); // Notify listeners when look direction changes
+            }
+        }
+    }
+    private WeaponType _currentWeaponType = WeaponType.Pistol;
+    public WeaponType CurrentWeaponType
+    {
+        get => _currentWeaponType;
+        set
+        {
+            if (_currentWeaponType != value)
+            {
+                _currentWeaponType = value;
+                OnWeaponChanged?.Invoke(); // Notify listeners when weapon changes
+            }
+        }
+    }
+
+
+
 
     private void Awake()
     {
@@ -32,12 +111,29 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+
+        prefabManager = prefabManager = GetComponent<PlayerPrefabManager>();
+
+        currentColorVariant = ColorVariant.A; // Set the default color variant
+        _currentWeaponType = WeaponType.Pistol; // Set the default weapon type
+        _lookDirection = Vector2.down; // Set the default look direction
+
+        SwapPrefab(); // Swap the prefab based on the initial values
+
         rb = GetComponent<Rigidbody2D>();
 
         rb.linearDamping = 0;
         rb.angularDamping = 0;
 
-        animator = GetComponent<Animator>();
+        // Subscribe to events to trigger prefab swap when values change
+        OnShootingChanged += SetOverlayActive;
+        OnMovementChanged += SwapPrefab;
+        OnLookDirectionChanged += SwapPrefab;
+        OnWeaponChanged += SwapPrefab;
+
+        Debug.Log($"Overlay Animators Count: {overlayAnimators?.Length ?? 0}");
+
+
     }
 
     private void OnEnable() 
@@ -68,10 +164,10 @@ public class PlayerController : MonoBehaviour
 
         if (newLookDirection != Vector2.zero)
         {
-            lookDirection = newLookDirection.normalized;
-            if (!isShooting)
+            LookDirection = newLookDirection.normalized;
+            if (!_isShooting)
             {
-                isShooting = true;
+                IsShooting = true;
                 shootingCoroutine = StartCoroutine(ShootContinuously());
             }
         }
@@ -80,37 +176,11 @@ public class PlayerController : MonoBehaviour
             StopShooting();
         }
 
-        // Sjekk bevegelsesretning
-        Vector3 direction = moveDirection.normalized;
-
-        // Velg retning basert p� den st�rste komponenten
-        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-        {
-            // Bevegelse hovedsakelig horisontalt
-            animator.SetFloat("MoveX", Mathf.Abs(direction.x));
-            animator.SetFloat("MoveY", 0); // Nullstill Y for � unng� feilaktig animasjon
-
-            if (direction.x > 0)
-                transform.localScale = new Vector3(-1, 1, 1); // Speil p� x-aksen
-            else
-                transform.localScale = new Vector3(1, 1, 1); // Normal retning
-        }
-        else
-        {
-            // Bevegelse hovedsakelig vertikalt
-            animator.SetFloat("MoveX", 0); // Nullstill X for � unng� feilaktig animasjon
-            animator.SetFloat("MoveY", direction.y);
-        }
-
-        // Hvis spilleren ikke beveger seg, sett animasjonen til 0
-        if (moveDirection == Vector2.zero)
-        {
-            animator.SetFloat("MoveX", 0);
-            animator.SetFloat("MoveY", 0);
-        }
+        // Set the movement state
+        IsMoving = moveDirection != Vector2.zero;
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate() 
     {
         // Determine the target velocity based on input and max speed
         Vector2 targetVelocity = moveDirection * maxSpeed;
@@ -132,9 +202,28 @@ public class PlayerController : MonoBehaviour
 
         
     }
+    // Method to enable or disable overlay animators. This activates or deactivates the firing animation.
+    public void SetOverlayActive()
+    {
+        foreach (var overlayAnimator in overlayAnimators)
+        {
+            if (overlayAnimator != null)
+            {
+                // Completely disable/hide the overlay animator if it's a muzzle flash
+                // Otherwise, just enable or disable the animator
+                if (overlayAnimator.name.Contains("muzzle_flash"))
+                {
+                    overlayAnimator.gameObject.SetActive(_isShooting);
+                } else
+                {
+                    overlayAnimator.enabled = _isShooting;
+                }
+            }
+        }
+    }
 
     // Wrapper method to match the required signature
-  private void OnFirePerformed(InputAction.CallbackContext context)
+    private void OnFirePerformed(InputAction.CallbackContext context)
   {
       Fire(); // Call the actual firing logic
   }
@@ -145,7 +234,7 @@ public class PlayerController : MonoBehaviour
       GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
       // Calculate the angle and set the rotation
-      float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
+      float angle = Mathf.Atan2(_lookDirection.y, _lookDirection.x) * Mathf.Rad2Deg;
       projectile.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 180));
 
 
@@ -153,30 +242,96 @@ public class PlayerController : MonoBehaviour
       Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
       if (rb != null)
       {
-          rb.linearVelocity = lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
+          rb.linearVelocity = _lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
       }
   }
 
 
+    public void SwapPrefab()
+    {
+        if (prefabManager == null)
+        {
+            Debug.LogError("PlayerPrefabManager is not assigned to the PlayerController.");
+            return;
+        }
+
+        // Use the current weapon type and color variant to select the appropriate prefab
+        WeaponType currentWeapon = _currentWeaponType;   
+        ColorVariant currentColor = currentColorVariant;
+        PlayerDirection newDirection;
+
+        if (_lookDirection.x > 0 || _lookDirection.x < 0) { // Sideways
+            newDirection = _isMoving ? PlayerDirection.Side_Walk : PlayerDirection.Side_Idle;
+            if(_lookDirection.x > 0) isFacingRight = true; 
+            else isFacingRight = false;
+        }
+        else if (_lookDirection.y > 0)  { // Up
+            newDirection = _isMoving ? PlayerDirection.Up_Walk : PlayerDirection.Up_Idle;
+           isFacingRight = false;
+        }
+        else if (_lookDirection.y < 0) { // Down
+            newDirection = _isMoving ? PlayerDirection.Down_Walk : PlayerDirection.Down_Idle;
+            isFacingRight = false;
+        }
+        else { // Default when no movement or direction 
+            newDirection = PlayerDirection.Down_Idle;
+            isFacingRight = false;
+            Debug.LogError("Not able to find correct prefab");
+        }
+
+        // Call the prefab manager to swap the prefab
+        currentPlayerPrefab = prefabManager.SwapPrefab(currentWeapon, currentColor, newDirection);
+
+        currentPlayerPrefab.transform.localScale = new Vector3(1, 1, 1); // Reset the scale to default for the prefab
+        transform.localScale = new Vector3(!isFacingRight ? 1 : -1, 1, 1); // Flip the player based on the direction
+
+        // Find the base and overlay animators in the new prefab
+        overlayAnimators = currentPlayerPrefab.GetComponentsInChildren<Animator>();
+        // Find the base animator (if it exists)
+        if (_isMoving) {
+            baseAnimator = currentPlayerPrefab.GetComponentInChildren<Animator>(); // Find base animator in child objects
+            overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator); // Remove the base animator from the overlay animators
+        }
+        else
+        {
+            baseAnimator = null; // No base animator when not moving
+        }
+        SetOverlayActive(); // Enable or disable the overlay animators based on the initial shooting state
+    }
+
+
     private void StartShooting(InputAction.CallbackContext context)
     {
-      Vector2 input = context.ReadValue<Vector2>();
-      
-      if (input.x > 0) lookDirection = Vector2.right;    // L key
-      else if (input.x < 0) lookDirection = Vector2.left; // J key
-      else if (input.y > 0) lookDirection = Vector2.up;   // I key
-      else if (input.y < 0) lookDirection = Vector2.down; // K key
 
-      if (!isShooting)
+        Vector2 input = context.ReadValue<Vector2>();
+        if (input.x > 0)
+        {
+            _lookDirection = Vector2.right;    // L key
+        }
+        else if (input.x < 0)
+        {
+            _lookDirection = Vector2.left; // J key
+        }
+        else if (input.y > 0)
+        {
+            _lookDirection = Vector2.up;   // I key
+        }
+        else if (input.y < 0)
+        {
+            _lookDirection = Vector2.down; // K key
+        }
+
+      if (!_isShooting)
       {
-          isShooting = true;
+          IsShooting = true;
           shootingCoroutine = StartCoroutine(ShootContinuously());
       }
     }
+    
 
     private void StopShooting()
     {
-        isShooting = false;
+        IsShooting = false;
         if (shootingCoroutine != null)
         {
             StopCoroutine(shootingCoroutine);
@@ -186,7 +341,8 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator ShootContinuously()
     {
-        while (isShooting)
+
+        while (_isShooting)
         {
             Fire();
 
