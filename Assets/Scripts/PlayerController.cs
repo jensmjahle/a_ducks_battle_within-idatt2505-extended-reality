@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private float maxSpeed = 10f;
     private float acceleration = 10f; // Speed to increase to max speed
     private float deceleration = 10f; // Speed to decrease when stopping
-    private bool isShooting = false;
+   
     private bool isFacingRight = false;
     private ColorVariant currentColorVariant;
     private Coroutine shootingCoroutine;
@@ -40,11 +40,26 @@ public class PlayerController : MonoBehaviour
 
 
     // Events to notify when a value changes
+    public event Action OnShootingChanged;
     public event Action OnMovementChanged;
     public event Action OnLookDirectionChanged;
     public event Action OnWeaponChanged;
 
+
     // Properties to encapsulate the state and notify listeners when a change occurs
+    private bool _isShooting = false;
+    public bool IsShooting
+    {
+        get => _isShooting;
+        set
+        {
+            if (_isShooting != value)
+            {
+                _isShooting = value;
+                OnShootingChanged?.Invoke(); // Notify listeners when movement state changes
+            }
+        }
+    }
     private bool _isMoving = false;
     public bool IsMoving
     {
@@ -72,7 +87,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     private WeaponType _currentWeaponType = WeaponType.Pistol;
     public WeaponType CurrentWeaponType
     {
@@ -106,20 +120,16 @@ public class PlayerController : MonoBehaviour
 
         //currentPlayerPrefab = prefabManager.SwapPrefab(currentWeaponType, currentColorVariant, PlayerDirection.Down_Idle);
 
-        SwapPrefab();
+        SwapPrefab(); // Swap the prefab based on the initial values
+   
 
-        // Find the base animator (which always runs)
-        if (currentPlayerPrefab != null)
-        {
-            baseAnimator = currentPlayerPrefab.GetComponentInChildren<Animator>(); // Find base animator in child objects
-            // Find all child animators and store them (overlay or second overlay)
-            overlayAnimators = currentPlayerPrefab.GetComponentsInChildren<Animator>();
 
-            // Filter out the base animator from the overlay animators (assuming only one animator is for the base)
-            overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator);
-        }
-        // Initialize the player prefab
        
+
+        SetOverlayActive(); // Enable or disable the overlay animators based on the initial shooting state
+
+                            // Initialize the player prefab
+                            //  SetOverlayActive(false); // Disable the overlay animators by default
 
         rb = GetComponent<Rigidbody2D>();
 
@@ -127,9 +137,13 @@ public class PlayerController : MonoBehaviour
         rb.angularDamping = 0;
 
         // Subscribe to events to trigger prefab swap when values change
+        OnShootingChanged += SetOverlayActive;
         OnMovementChanged += SwapPrefab;
         OnLookDirectionChanged += SwapPrefab;
         OnWeaponChanged += SwapPrefab;
+
+        Debug.Log($"Overlay Animators Count: {overlayAnimators?.Length ?? 0}");
+
 
     }
 
@@ -159,30 +173,31 @@ public class PlayerController : MonoBehaviour
         moveDirection = move.ReadValue<Vector2>();
         Vector2 newLookDirection = look.ReadValue<Vector2>();
 
-      //  Debug.Log("Look " + newLookDirection);
-      //  Debug.Log("LOOK DIRECTION " + _lookDirection);
+     
 
         if (newLookDirection != Vector2.zero)
         {
             LookDirection = newLookDirection.normalized;
-            if (!isShooting)
+            if (!_isShooting)
             {
-                isShooting = true;
-            //    SetOverlayActive(true); // Enable the firing overlay animation
+                IsShooting = true;
+               // SetOverlayActive(true); // Enable the firing overlay animation
+              //  Debug.Log("Start shooting");
                 shootingCoroutine = StartCoroutine(ShootContinuously());
             }
         }
         else
         {
             StopShooting();
-          //  SetOverlayActive(false); // Disable the firing overlay animation    
+           // SetOverlayActive(false); // Disable the firing overlay animation
+          //  Debug.Log("Stop shooting");
         }
 
         // Set the movement state
         IsMoving = moveDirection != Vector2.zero;
 
        
-
+        //Debug.Log(_isShooting);
 
     }
 
@@ -212,13 +227,17 @@ public class PlayerController : MonoBehaviour
 
 
     // Method to enable or disable overlay animators. This activates or deactivates the firing animation.
-    public void SetOverlayActive(bool isActive)
+    public void SetOverlayActive()
     {
+        Debug.Log("Overlay animator count: " + overlayAnimators.Length);
         foreach (var overlayAnimator in overlayAnimators)
         {
             if (overlayAnimator != null)
             {
-                overlayAnimator.enabled = isActive;
+                overlayAnimator.enabled = _isShooting;
+                Debug.Log("Overlay animator enabled: " + _isShooting);
+                Debug.Log("Overlay animator name: " + overlayAnimator.name);
+                Debug.Log("Firing " + _isShooting);
             }
         }
     }
@@ -286,20 +305,29 @@ public class PlayerController : MonoBehaviour
         currentPlayerPrefab.transform.localScale = new Vector3(1, 1, 1); // Reset the scale to default for the prefab
         transform.localScale = new Vector3(!isFacingRight ? 1 : -1, 1, 1); // Flip the player based on the direction
 
-        // Find the base animator (which always runs)
-        baseAnimator = currentPlayerPrefab.GetComponentInChildren<Animator>(); // Find base animator in child objects
-            // Find all child animators and store them (overlay or second overlay)
-            overlayAnimators = currentPlayerPrefab.GetComponentsInChildren<Animator>();
+        overlayAnimators = currentPlayerPrefab.GetComponentsInChildren<Animator>();
 
-            // Filter out the base animator from the overlay animators (assuming only one animator is for the base)
+        // Find the base animator (if it exists)
+        if (_isMoving) {
+            baseAnimator = currentPlayerPrefab.GetComponentInChildren<Animator>(); // Find base animator in child objects
             overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator);
+            Debug.Log("Base animator: " + baseAnimator.name);
+        }
+        else
+        {
+            baseAnimator = null; // No base animator when not moving
+        }
 
+        foreach(var animator in overlayAnimators)
+        {
+            Debug.Log("Overlay animator: " + animator.name);
+        }
+        SetOverlayActive(); // Enable or disable the overlay animators based on the initial shooting state
     }
 
 
     private void StartShooting(InputAction.CallbackContext context)
     {
-        SetOverlayActive(true); // Enable the firing overlay animation
 
         Vector2 input = context.ReadValue<Vector2>();
         if (input.x > 0)
@@ -319,9 +347,9 @@ public class PlayerController : MonoBehaviour
             _lookDirection = Vector2.down; // K key
         }
 
-      if (!isShooting)
+      if (!_isShooting)
       {
-          isShooting = true;
+          IsShooting = true;
           shootingCoroutine = StartCoroutine(ShootContinuously());
       }
     }
@@ -329,8 +357,7 @@ public class PlayerController : MonoBehaviour
 
     private void StopShooting()
     {
-       SetOverlayActive(false); // Disable the firing overlay animation
-        isShooting = false;
+        IsShooting = false;
         if (shootingCoroutine != null)
         {
             StopCoroutine(shootingCoroutine);
@@ -340,7 +367,8 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator ShootContinuously()
     {
-        while (isShooting)
+
+        while (_isShooting)
         {
             Fire();
 
