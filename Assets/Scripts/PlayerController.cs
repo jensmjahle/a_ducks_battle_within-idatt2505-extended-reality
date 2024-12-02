@@ -162,8 +162,6 @@ public class PlayerController : MonoBehaviour
         moveDirection = move.ReadValue<Vector2>();
         Vector2 newLookDirection = look.ReadValue<Vector2>();
 
-     
-
         if (newLookDirection != Vector2.zero)
         {
             LookDirection = newLookDirection.normalized;
@@ -176,15 +174,10 @@ public class PlayerController : MonoBehaviour
         else
         {
             StopShooting();
-          
         }
 
         // Set the movement state
         IsMoving = moveDirection != Vector2.zero;
-
-       
-        //Debug.Log(_isShooting);
-
     }
 
     private void FixedUpdate() 
@@ -209,13 +202,9 @@ public class PlayerController : MonoBehaviour
 
         
     }
-    
-
-
     // Method to enable or disable overlay animators. This activates or deactivates the firing animation.
     public void SetOverlayActive()
     {
-        Debug.Log("Overlay animator count: " + overlayAnimators.Length);
         foreach (var overlayAnimator in overlayAnimators)
         {
             if (overlayAnimator != null)
@@ -229,12 +218,6 @@ public class PlayerController : MonoBehaviour
                 {
                     overlayAnimator.enabled = _isShooting;
                 }
-
-                // overlayAnimator.enabled = _isShooting;
-                //overlayAnimator.gameObject.SetActive(_isShooting);
-                Debug.Log("Overlay animator enabled: " + _isShooting);
-                Debug.Log("Overlay animator name: " + overlayAnimator.name);
-                Debug.Log("Firing " + _isShooting);
             }
         }
     }
@@ -277,9 +260,9 @@ public class PlayerController : MonoBehaviour
         ColorVariant currentColor = currentColorVariant;
         PlayerDirection newDirection;
 
-        if (_lookDirection.x > 0 || _lookDirection.x < 0) { // Right
+        if (_lookDirection.x > 0 || _lookDirection.x < 0) { // Sideways
             newDirection = _isMoving ? PlayerDirection.Side_Walk : PlayerDirection.Side_Idle;
-            if(_lookDirection.x > 0) isFacingRight = true;
+            if(_lookDirection.x > 0) isFacingRight = true; 
             else isFacingRight = false;
         }
         else if (_lookDirection.y > 0)  { // Up
@@ -293,8 +276,8 @@ public class PlayerController : MonoBehaviour
         else { // Default when no movement or direction 
             newDirection = PlayerDirection.Down_Idle;
             isFacingRight = false;
+            Debug.LogError("Not able to find correct prefab");
         }
-
 
         // Call the prefab manager to swap the prefab
         currentPlayerPrefab = prefabManager.SwapPrefab(currentWeapon, currentColor, newDirection);
@@ -302,22 +285,16 @@ public class PlayerController : MonoBehaviour
         currentPlayerPrefab.transform.localScale = new Vector3(1, 1, 1); // Reset the scale to default for the prefab
         transform.localScale = new Vector3(!isFacingRight ? 1 : -1, 1, 1); // Flip the player based on the direction
 
+        // Find the base and overlay animators in the new prefab
         overlayAnimators = currentPlayerPrefab.GetComponentsInChildren<Animator>();
-
         // Find the base animator (if it exists)
         if (_isMoving) {
             baseAnimator = currentPlayerPrefab.GetComponentInChildren<Animator>(); // Find base animator in child objects
-            overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator);
-            Debug.Log("Base animator: " + baseAnimator.name);
+            overlayAnimators = System.Array.FindAll(overlayAnimators, animator => animator != baseAnimator); // Remove the base animator from the overlay animators
         }
         else
         {
             baseAnimator = null; // No base animator when not moving
-        }
-
-        foreach(var animator in overlayAnimators)
-        {
-            Debug.Log("Overlay animator: " + animator.name);
         }
         SetOverlayActive(); // Enable or disable the overlay animators based on the initial shooting state
     }
