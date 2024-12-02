@@ -27,7 +27,7 @@ public class PlayerPrefabManager : MonoBehaviour
     }
 
     // Method to swap prefabs based on weapon type, color variant, and direction
-    public void SwapPrefab(WeaponType weaponType, ColorVariant colorVariant, PlayerDirection direction)
+    public GameObject SwapPrefab(WeaponType weaponType, ColorVariant colorVariant, PlayerDirection direction)
     {
         // Find the matching prefab based on weaponType, colorVariant, and direction
         PlayerPrefabVariant selectedPrefab = FindPrefabByWeaponColorAndDirection(weaponType, colorVariant, direction);
@@ -43,11 +43,14 @@ public class PlayerPrefabManager : MonoBehaviour
             // Instantiate the new prefab and set it as the new player
             currentPlayerPrefab = Instantiate(selectedPrefab.prefab, transform.position, transform.rotation);
             currentPlayerPrefab.transform.SetParent(transform); // Keep it under the same parent
+            return currentPlayerPrefab;// Return the new prefab
         }
         else
         {
             Debug.LogError("Prefab not found for weapon type: " + weaponType + ", color variant: " + colorVariant + ", and direction: " + direction);
+            return null; // Return null if no prefab is found
         }
+       
     }
 
     // This method searches for the correct prefab based on the selected weapon type, color variant, and direction
