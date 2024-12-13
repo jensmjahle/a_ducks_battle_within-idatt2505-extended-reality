@@ -6,15 +6,13 @@ public class PauseGame : MonoBehaviour
 
     private GameObject pauseCanvas;
 
-    // Called when the game starts
     void Start()
     {
-        // Try to find the PauseCanvas at the start
-        pauseCanvas = GameObject.Find("PauseCanvas"); // Ensure this matches your canvas name
+        pauseCanvas = GameObject.Find("PauseCanvas");
 
         if (pauseCanvas != null)
         {
-            pauseCanvas.SetActive(false); // Ensure the canvas is hidden initially
+            pauseCanvas.SetActive(false);
         }
         else
         {
@@ -22,19 +20,15 @@ public class PauseGame : MonoBehaviour
         }
     }
 
-    // Toggle the pause state
     public void TogglePause()
     {
-        // Toggle the pause state
         isPaused = !isPaused;
 
-        // Pause or unpause the game by controlling Time.timeScale
         Time.timeScale = isPaused ? 0 : 1;
 
-        // Show/hide the pause menu (PauseCanvas)
         if (pauseCanvas != null)
         {
-            pauseCanvas.SetActive(isPaused);  // Activate or deactivate the canvas based on isPaused
+            pauseCanvas.SetActive(isPaused); 
         }
         else
         {
