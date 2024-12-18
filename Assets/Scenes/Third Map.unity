@@ -60251,10 +60251,11 @@ MonoBehaviour:
   currentRound: 1
   enemiesPerRound: 10
   maxEnemies: 25
-  roundText: {fileID: 44246925}
-  score: {fileID: 1048517739}
   scoreValue: 0
   totEnemiesKilled: 0
+  currentMap: First Map
+  roundText: {fileID: 44246925}
+  score: {fileID: 1048517739}
 --- !u!4 &1384809532
 Transform:
   m_ObjectHideFlags: 0
@@ -71392,7 +71393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disableDataPersistence: 0
-  initializeDataIfNull: 0
+  initializeDataIfNull: 1
   fileName: gamedata.json
 --- !u!4 &1577560196
 Transform:

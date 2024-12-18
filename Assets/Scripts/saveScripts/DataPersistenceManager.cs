@@ -17,8 +17,6 @@ public class DataPersistenceManager : MonoBehaviour
     private List<IDataPersistence> dataPersistenceObjects;
     private FileDataHandler dataHandler;
 
-    private Coroutine autoSaveCoroutine;
-
     public static DataPersistenceManager instance { get; private set; }
 
     private void Awake()
@@ -68,10 +66,12 @@ public class DataPersistenceManager : MonoBehaviour
             return;
         }
 
+        // Attempt to load the game data from the file
         this.gameData = dataHandler.Load("single_save");
 
         if (this.gameData == null && initializeDataIfNull)
         {
+            // If no data exists and we need to initialize a new game, we create a new GameData object
             NewGame();
         }
 
@@ -81,6 +81,7 @@ public class DataPersistenceManager : MonoBehaviour
             return;
         }
 
+        // Load the data into all persistence objects
         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.LoadData(gameData);
@@ -100,11 +101,13 @@ public class DataPersistenceManager : MonoBehaviour
             return;
         }
 
+        // Update the gameData before saving
         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.SaveData(ref gameData);
         }
 
+        // Save the updated game data to the file
         dataHandler.Save(gameData, "single_save");
     }
 
