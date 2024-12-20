@@ -8,6 +8,9 @@ public class PauseGame : MonoBehaviour
 
     void Start()
     {
+        // Ensure the game starts with Time.timeScale set to 1
+        Time.timeScale = 1;
+
         pauseCanvas = GameObject.Find("PauseCanvas");
 
         if (pauseCanvas != null)

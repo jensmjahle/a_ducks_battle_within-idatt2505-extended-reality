@@ -12,6 +12,7 @@ public class DataPersistenceManager : MonoBehaviour
 
     [Header("File Storage Config")]
     [SerializeField] private string fileName;
+    [SerializeField] private string profileId; // Add profileId field
 
     private GameData gameData;
     private List<IDataPersistence> dataPersistenceObjects;
@@ -21,12 +22,12 @@ public class DataPersistenceManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance != null)
+        /*if (instance != null)
         {
             Debug.Log("Found more than one Data Persistence Manager in the scene. Destroying the newest one.");
             Destroy(this.gameObject);
             return;
-        }
+        }*/
         instance = this;
         DontDestroyOnLoad(this.gameObject);
 
@@ -36,6 +37,7 @@ public class DataPersistenceManager : MonoBehaviour
         }
 
         this.dataHandler = new FileDataHandler(Application.persistentDataPath, fileName);
+        Debug.Log("DataPersistenceManager initialized.");
     }
 
     private void OnEnable()
@@ -67,7 +69,7 @@ public class DataPersistenceManager : MonoBehaviour
         }
 
         // Attempt to load the game data from the file
-        this.gameData = dataHandler.Load("single_save");
+        this.gameData = dataHandler.Load(profileId);
 
         if (this.gameData == null && initializeDataIfNull)
         {
@@ -107,13 +109,24 @@ public class DataPersistenceManager : MonoBehaviour
             dataPersistenceObj.SaveData(ref gameData);
         }
 
+        // Update the current map in gameData
+        gameData.currentMap = SceneManager.GetActiveScene().name;
+
         // Save the updated game data to the file
-        dataHandler.Save(gameData, "single_save");
+        dataHandler.Save(gameData, profileId);
     }
 
     private void OnApplicationQuit()
     {
-        SaveGame();
+        if (SceneManager.GetActiveScene().name != "Main Menu" &&
+            SceneManager.GetActiveScene().name != "Options" &&
+            SceneManager.GetActiveScene().name != "Sounds")
+        {
+            Debug.Log("The current scene is " + SceneManager.GetActiveScene().name);
+            Debug.Log("Saving game data before quitting.");
+            SaveGame();
+        }
+        Destroy(this.gameObject);
     }
 
     private List<IDataPersistence> FindAllDataPersistenceObjects()
@@ -127,5 +140,33 @@ public class DataPersistenceManager : MonoBehaviour
     public bool HasGameData()
     {
         return gameData != null;
+    }
+
+    public bool SaveFileExists()
+    {
+        return dataHandler.SaveFileExists(profileId);
+    }
+
+    public void DestroyDataPersistenceManager()
+    {
+        Destroy(this.gameObject);
+    }
+
+    public void DeleteSaveFile()
+    {
+        dataHandler.DeleteSaveFile(profileId);
+    }
+
+    public string GetCurrentMap()
+    {
+        if (gameData != null)
+        {
+            return gameData.currentMap;
+        }
+        else
+        {
+            Debug.LogWarning("GameData is null. Returning default map.");
+            return "Third Map"; // Default map if gameData is null
+        }
     }
 }

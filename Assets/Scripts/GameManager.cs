@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     private void Start()
     {
         // Retrieve the map from PlayerPrefs or use default
-        LoadSelectedMap();
+        //LoadSelectedMap();
         UpdateRoundText();
     }
 

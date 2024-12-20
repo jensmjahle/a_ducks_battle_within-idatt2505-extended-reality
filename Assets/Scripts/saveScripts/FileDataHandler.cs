@@ -126,4 +126,21 @@ public class FileDataHandler
 
         return profileDictionary;
     }
+
+    public bool SaveFileExists(string profileId)
+    {
+        string fullPath = Path.Combine(dataDirPath, profileId, dataFileName);
+        Debug.Log($"Checking if save file exists at: {fullPath}");
+        return File.Exists(fullPath);
+    }
+
+    public void DeleteSaveFile(string profileId)
+    {
+        string fullPath = Path.Combine(dataDirPath, profileId, dataFileName);
+        if (File.Exists(fullPath))
+        {
+            File.Delete(fullPath);
+        }
+    }
+
 }
