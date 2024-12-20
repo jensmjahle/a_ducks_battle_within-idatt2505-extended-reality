@@ -14,6 +14,7 @@ public class BreadPickup : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
+            Debug.Log("Player collided with bread");
             HealthManager healthManager = collision.GetComponent<HealthManager>();
             if (healthManager != null)
             {

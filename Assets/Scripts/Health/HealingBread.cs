@@ -3,8 +3,8 @@
 
     public class HealingBread : MonoBehaviour
     {
-        public float bobHeight = 0.5f;
-        public float bobSpeed = 2f;
+        public float bobHeight = 0.2f;
+        public float bobSpeed = 3f;
 
         private Vector3 startPosition;
 
