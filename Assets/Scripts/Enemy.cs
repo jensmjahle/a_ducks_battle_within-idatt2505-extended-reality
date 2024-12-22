@@ -7,13 +7,16 @@ public class Enemy : MonoBehaviour
 {
     private int health = 100;
     public float speed;
+    public int damageToPlayer = 2;
+    public float damageInterval = 0.5f;
+    private float damageTimer = 0f;
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
     private Rigidbody2D rb;
     private PolygonCollider2D polygonCollider;
     private bool isDead = false;
-
+    private bool isTouchingPlayer = false;
     public GameObject breadPrefab;
     public float breadDropChance = 25f; 
     
@@ -113,6 +116,25 @@ public class Enemy : MonoBehaviour
     {
         if (isDead) return;
 
+        // Periodically deal damage if touching the player
+        if (isTouchingPlayer)
+        {
+            Debug.Log("Touching player");
+            damageTimer += Time.deltaTime;
+            if (damageTimer >= damageInterval)
+            {
+                damageTimer = 0f; // Reset the timer
+
+                // Deal damage to the player
+                HealthManager playerHealth = player.GetComponent<HealthManager>();
+                if (playerHealth != null)
+                {
+                    Debug.Log("Dealing damage to player");
+                    playerHealth.TakeDamage(damageToPlayer);
+                }
+            }
+        }
+
         if (player != null)
         {
             agent.SetDestination(player.position);
@@ -143,6 +165,22 @@ public class Enemy : MonoBehaviour
                 animator.SetFloat("MoveX", 0);
                 animator.SetFloat("MoveY", direction.y);
             }
+        }
+    }
+    void OnTriggerEnter2D(Collider2D collision) // Or OnTriggerEnter for 3D
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isTouchingPlayer = true; // Start the damage timer
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision) // Or OnTriggerExit for 3D
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isTouchingPlayer = false; // Stop dealing damage
+            damageTimer = 0f; // Reset the timer
         }
     }
 }
