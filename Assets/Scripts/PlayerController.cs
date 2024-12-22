@@ -3,6 +3,8 @@ using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using UnityEditor.Callbacks;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class PlayerController : MonoBehaviour
     private PauseGame pauseGame;
     private InputAction pause;
 
+    private Dictionary<Vector2, Vector2> firePointOffsets; // Offsets for each direction
 
     // Prefab management
     public GameObject currentPlayerPrefab;
@@ -270,23 +273,41 @@ void Start()
         Debug.LogError("PauseGame script is not assigned!");
     }
     }
-      private void Fire()
-  {
-      // Instantiate the projectile
-      GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+private void Fire()
+{
+    if (_lookDirection == Vector2.zero || firePoint == null )
+        return;
 
-      // Calculate the angle and set the rotation
-      float angle = Mathf.Atan2(_lookDirection.y, _lookDirection.x) * Mathf.Rad2Deg;
-      projectile.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 180));
+    // Determine the offset based on the look direction
+    Vector2 offset = Vector2.zero;
 
+    if (_lookDirection.x > 0) // Facing right
+        offset = new Vector2(1.0f, -0.5f);
+    else if (_lookDirection.x < 0) // Facing left
+        offset = new Vector2(-1.0f, -0.5f);
+    else if (_lookDirection.y > 0) // Facing up
+        offset = new Vector2(0f, 1.2f);
+    else if (_lookDirection.y < 0) // Facing down
+        offset = new Vector2(0f, -1.5f);
 
-      // Apply velocity to the projectile
-      Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-      if (rb != null)
-      {
-          rb.linearVelocity = _lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
-      }
-  }
+    // Update the firePoint position relative to the gun model
+    firePoint.position = (Vector2)transform.position + offset;
+
+    // Instantiate the projectile
+    GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+
+    // Calculate the angle and set the rotation
+    float angle = Mathf.Atan2(_lookDirection.y, _lookDirection.x) * Mathf.Rad2Deg;
+    projectile.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 180));
+
+    // Apply velocity to the projectile
+    Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+    if (rb != null)
+    {
+        rb.linearVelocity = _lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
+    }
+}
+
 
 
     public void SwapPrefab()
