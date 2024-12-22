@@ -31439,6 +31439,7 @@ GameObject:
   - component: {fileID: 1701927686}
   - component: {fileID: 1701927689}
   - component: {fileID: 1701927691}
+  - component: {fileID: 1701927692}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -31604,6 +31605,20 @@ MonoBehaviour:
     weaponType: 3
     colorVariant: 0
     direction: 4
+--- !u!114 &1701927692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1701927683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fe39f3e654c2cf4bb45734304f43be5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBar: {fileID: 713488906}
+  healthAmount: 100
 --- !u!1 &1748406917
 GameObject:
   m_ObjectHideFlags: 0
