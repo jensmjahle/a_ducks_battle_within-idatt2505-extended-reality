@@ -30532,7 +30532,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 4192821937313853047, guid: 68e869c477f8fe9408a65e063b5181c9, type: 3}
   player: {fileID: 1701927688}
-  spawnDelay: 10
+  spawnDelay: 1
 --- !u!4 &1763259958
 Transform:
   m_ObjectHideFlags: 0
