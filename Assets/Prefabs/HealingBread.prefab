@@ -150,6 +150,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bobHeight: 0.2
   bobSpeed: 3
+  despawnTime: 30
+  flashStartTime: 20
+  flashInterval: 0.2
 --- !u!114 &4930691215749967546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,4 +166,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healAmount: 20
-  despawnTime: 30
