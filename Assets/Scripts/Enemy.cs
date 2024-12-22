@@ -14,6 +14,9 @@ public class Enemy : MonoBehaviour
     private PolygonCollider2D polygonCollider;
     private bool isDead = false;
 
+    public GameObject breadPrefab;
+    public float breadDropChance = 25f; 
+    
     void Start()
     {
         player = GameObject.FindWithTag("Player").transform;
@@ -70,10 +73,24 @@ public class Enemy : MonoBehaviour
         // Set isDead to true so we don't process death again
         isDead = true;
 
+        // Spawn bread with a chance
+        TrySpawnBread();
+        
         // Start a coroutine to destroy the object after the animation finishes
         StartCoroutine(WaitForDieAnimation());
     }
 
+    private void TrySpawnBread()
+    {
+        if (breadPrefab == null) return; // Ensure the breadPrefab is assigned
+        
+        float randomValue = Random.Range(0f, 100f); // Generate a random number between 0 and 100
+        if (randomValue <= breadDropChance) // Check if it's within the drop chance
+        {
+            Instantiate(breadPrefab, transform.position, Quaternion.identity); // Spawn the bread
+        }
+    }
+    
     private IEnumerator WaitForDieAnimation()
     {
         // Get the current animation state information
