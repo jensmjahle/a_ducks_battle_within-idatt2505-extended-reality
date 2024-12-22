@@ -70,4 +70,16 @@ public class StartMap : MonoBehaviour
         Debug.Log("Loading map: " + currentMap);
         SceneManager.LoadScene(currentMap);
     }
+
+    // Method to quit the application
+    public void QuitApplication()
+    {
+        Debug.Log("Quitting application...");
+        Application.Quit();
+
+        #if UNITY_EDITOR
+                // Simulate application quit in the Unity Editor
+                UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+    }
 }
