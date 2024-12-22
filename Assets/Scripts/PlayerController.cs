@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     public Rigidbody2D rb;
     public GameObject projectilePrefab;
     public Transform firePoint;
+    private PauseGame pauseGame;
+    private InputAction pause;
+
 
     // Prefab management
     public GameObject currentPlayerPrefab;
@@ -109,34 +112,57 @@ public class PlayerController : MonoBehaviour
         playerControls = new PlayerInputActions();
     }
 
-    void Start()
+void Start()
+{
+    // Retrieve and validate the PlayerPrefabManager component
+    prefabManager = GetComponent<PlayerPrefabManager>();
+    if (prefabManager == null)
     {
-
-        prefabManager = prefabManager = GetComponent<PlayerPrefabManager>();
-
-        currentColorVariant = ColorVariant.A; // Set the default color variant
-        _currentWeaponType = WeaponType.Pistol; // Set the default weapon type
-        _lookDirection = Vector2.down; // Set the default look direction
-
-        SwapPrefab(); // Swap the prefab based on the initial values
-
-        rb = GetComponent<Rigidbody2D>();
-
-        rb.linearDamping = 0;
-        rb.angularDamping = 0;
-
-        // Subscribe to events to trigger prefab swap when values change
-        OnShootingChanged += SetOverlayActive;
-        OnMovementChanged += SwapPrefab;
-        OnLookDirectionChanged += SwapPrefab;
-        OnWeaponChanged += SwapPrefab;
-
-        Debug.Log($"Overlay Animators Count: {overlayAnimators?.Length ?? 0}");
-
-
+        Debug.LogError("PlayerPrefabManager component is missing on this GameObject!");
+        return; // Exit Start to avoid further issues
     }
 
-    private void OnEnable() 
+    // Initialize default values
+    currentColorVariant = ColorVariant.A; // Set the default color variant
+    _currentWeaponType = WeaponType.Pistol; // Set the default weapon type
+    _lookDirection = Vector2.down; // Set the default look direction
+
+    // Perform the initial prefab swap
+    SwapPrefab();
+
+    // Retrieve and validate the Rigidbody2D component
+    rb = GetComponent<Rigidbody2D>();
+    if (rb == null)
+    {
+        Debug.LogError("Rigidbody2D component is missing on this GameObject!");
+        return; // Exit Start to avoid further issues
+    }
+
+    // Configure Rigidbody2D properties
+    rb.linearDamping = 0;
+    rb.angularDamping = 0;
+
+    // Ensure PauseGame script is assigned
+    pauseGame = FindObjectOfType<PauseGame>();
+    if (pauseGame == null)
+    {
+        Debug.LogError("PauseGame script is missing in the scene!");
+        return; // Exit Start to avoid further issues
+    }
+
+    // Subscribe to events to trigger prefab swap when values change
+    OnShootingChanged += SetOverlayActive;
+    OnMovementChanged += SwapPrefab;
+    OnLookDirectionChanged += SwapPrefab;
+    OnWeaponChanged += SwapPrefab;
+
+    // Debug log for overlay animators
+    Debug.Log($"Overlay Animators Count: {overlayAnimators?.Length ?? 0}");
+}
+
+
+
+    private void OnEnable()
     {
         move = playerControls.Player.Move;
         move.Enable();
@@ -147,6 +173,10 @@ public class PlayerController : MonoBehaviour
         fire = playerControls.Player.Fire;
         fire.Enable();
         fire.performed += OnFirePerformed;
+
+        pause = playerControls.Player.Pause;
+        pause.Enable();
+        pause.performed += OnPausePerformed;
     }
 
     private void OnDisable()
@@ -154,6 +184,7 @@ public class PlayerController : MonoBehaviour
         move.Disable();
         look.Disable();
         fire.Disable();
+        pause.Disable();
     }
 
     void Update()
@@ -228,6 +259,17 @@ public class PlayerController : MonoBehaviour
       Fire(); // Call the actual firing logic
   }
 
+    private void OnPausePerformed(InputAction.CallbackContext context)
+    {
+    if (pauseGame != null)
+    {
+        pauseGame.TogglePause();
+    }
+    else
+    {
+        Debug.LogError("PauseGame script is not assigned!");
+    }
+    }
       private void Fire()
   {
       // Instantiate the projectile
