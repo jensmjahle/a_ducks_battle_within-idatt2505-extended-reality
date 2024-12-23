@@ -377,5 +377,5 @@ MonoBehaviour:
   player: {fileID: 0}
   minGruntDelay: 5
   maxGruntDelay: 15
-  maxDistance: 20
-  minDistance: 3
+  maxDistance: 30
+  minDistance: 1
