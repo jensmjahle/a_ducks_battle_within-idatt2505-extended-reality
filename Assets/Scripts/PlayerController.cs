@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private GameObject activePlayerInstance;
     private Animator baseAnimator; // The base animator (always running)
     private Animator[] overlayAnimators; // Array to store overlay animators (can be 1 or 2)
-
+    public AudioSource footstepAudioSource; 
 
     private PlayerPrefabManager prefabManager;
 
@@ -76,6 +76,22 @@ public class PlayerController : MonoBehaviour
             {
                 _isMoving = value;
                 OnMovementChanged?.Invoke(); // Notify listeners when movement state changes
+            }
+            // Toggle the footstep sound
+            if (_isMoving)
+            {
+                if (footstepAudioSource != null && !footstepAudioSource.isPlaying)
+                {
+                    footstepAudioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+                    footstepAudioSource.Play();
+                }
+            }
+            else
+            {
+                if (footstepAudioSource != null && footstepAudioSource.isPlaying)
+                {
+                    footstepAudioSource.Stop();
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
-    private Rigidbody2D 
+    private Rigidbody2D rb;
     private CapsuleCollider2D damageTrigger;
     private CapsuleCollider2D collisionCollider;
     private bool isDead = false;
