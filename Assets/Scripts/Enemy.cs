@@ -19,8 +19,10 @@ public class Enemy : MonoBehaviour
     private bool isDead = false;
     private bool isTouchingPlayer = false;
     public GameObject breadPrefab;
-    public float breadDropChance = 25f; 
-    
+    public float breadDropChance = 25f;
+    public AudioSource playerHurtAudioSource;
+    public AudioClip[] hurtClips;
+
     void Start()
     {
         player = GameObject.FindWithTag("Player").transform;
@@ -29,8 +31,8 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         CapsuleCollider2D[] colliders = GetComponents<CapsuleCollider2D>();
 
-       damageTrigger = colliders[0]; 
-       collisionCollider = colliders[1];
+        damageTrigger = colliders[0];
+        collisionCollider = colliders[1];
 
         agent.speed = speed;
         agent.updateUpAxis = false; // Important for 2D games
@@ -39,12 +41,13 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (!isDead) {
-        health -= damage;
-        if (health <= 0)
+        if (!isDead)
         {
-            Die();
-        }
+            health -= damage;
+            if (health <= 0)
+            {
+                Die();
+            }
         }
     }
 
@@ -57,7 +60,7 @@ public class Enemy : MonoBehaviour
         // Stop movement by disabling the NavMeshAgent
         if (agent != null)
         {
-           // agent.isStopped = true;
+            // agent.isStopped = true;
             agent.enabled = false;
         }
 
@@ -65,7 +68,9 @@ public class Enemy : MonoBehaviour
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero; // Stop any residual movement
-            rb.bodyType = RigidbodyType2D.Kinematic; // Make the Rigidbody2D static, so it won't be affected by physics
+            rb.bodyType =
+                RigidbodyType2D
+                    .Kinematic; // Make the Rigidbody2D static, so it won't be affected by physics
         }
 
         // Disable the colliders
@@ -82,9 +87,11 @@ public class Enemy : MonoBehaviour
         // Set isDead to true so we don't process death again
         isDead = true;
 
+        // Play a random hurt sound
+        PlayHurtSound();
         // Spawn bread with a chance
         TrySpawnBread();
-        
+
         // Start a coroutine to destroy the object after the animation finishes
         StartCoroutine(WaitForDieAnimation());
     }
@@ -92,14 +99,14 @@ public class Enemy : MonoBehaviour
     private void TrySpawnBread()
     {
         if (breadPrefab == null) return; // Ensure the breadPrefab is assigned
-        
+
         float randomValue = Random.Range(0f, 100f); // Generate a random number between 0 and 100
         if (randomValue <= breadDropChance) // Check if it's within the drop chance
         {
             Instantiate(breadPrefab, transform.position, Quaternion.identity); // Spawn the bread
         }
     }
-    
+
     private IEnumerator WaitForDieAnimation()
     {
         // Get the current animation state information
@@ -113,11 +120,12 @@ public class Enemy : MonoBehaviour
         }
 
         // Wait for the animation duration
-        yield return new WaitForSeconds(stateInfo.length-1);
+        yield return new WaitForSeconds(stateInfo.length - 1);
 
         // Destroy this enemy
         Destroy(gameObject);
     }
+
     void Update()
     {
         if (isDead) return;
@@ -125,7 +133,6 @@ public class Enemy : MonoBehaviour
         // Periodically deal damage if touching the player
         if (isTouchingPlayer)
         {
-            Debug.Log("Touching player");
             damageTimer += Time.deltaTime;
             if (damageTimer >= damageInterval)
             {
@@ -135,7 +142,6 @@ public class Enemy : MonoBehaviour
                 HealthManager playerHealth = player.GetComponent<HealthManager>();
                 if (playerHealth != null)
                 {
-                    Debug.Log("Dealing damage to player");
                     playerHealth.TakeDamage(damageToPlayer);
                 }
             }
@@ -173,6 +179,7 @@ public class Enemy : MonoBehaviour
             }
         }
     }
+
     void OnTriggerEnter2D(Collider2D collision) // Or OnTriggerEnter for 3D
     {
         if (collision.CompareTag("Player"))
@@ -189,4 +196,16 @@ public class Enemy : MonoBehaviour
             damageTimer = 0f; // Reset the timer
         }
     }
+
+    private void PlayHurtSound()
+    {
+        if (hurtClips.Length > 0)
+        {
+            AudioClip selectedClip = hurtClips[Random.Range(0, hurtClips.Length)];
+            playerHurtAudioSource.clip = selectedClip;
+            playerHurtAudioSource.pitch = Random.Range(0.8f, 1.2f);
+            playerHurtAudioSource.Play();
+        }
+    }
+
 }
