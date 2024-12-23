@@ -120,10 +120,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
-
-
-
+    
     private void Awake()
     {
         playerControls = new PlayerInputActions();
