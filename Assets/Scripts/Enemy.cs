@@ -13,8 +13,9 @@ public class Enemy : MonoBehaviour
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
-    private Rigidbody2D rb;
-    private PolygonCollider2D polygonCollider;
+    private Rigidbody2D 
+    private CapsuleCollider2D damageTrigger;
+    private CapsuleCollider2D collisionCollider;
     private bool isDead = false;
     private bool isTouchingPlayer = false;
     public GameObject breadPrefab;
@@ -26,7 +27,10 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-        polygonCollider = GetComponent<PolygonCollider2D>();
+        CapsuleCollider2D[] colliders = GetComponents<CapsuleCollider2D>();
+
+       damageTrigger = colliders[0]; 
+       collisionCollider = colliders[1];
 
         agent.speed = speed;
         agent.updateUpAxis = false; // Important for 2D games
@@ -64,11 +68,13 @@ public class Enemy : MonoBehaviour
             rb.bodyType = RigidbodyType2D.Kinematic; // Make the Rigidbody2D static, so it won't be affected by physics
         }
 
-        // Disable the PolygonCollider2D
-        if (polygonCollider != null)
+        // Disable the colliders
+        if (collisionCollider != null && damageTrigger != null)
         {
-            polygonCollider.enabled = false; // Disable the PolygonCollider2D
+            damageTrigger.enabled = false;
+            collisionCollider.enabled = false;
         }
+
 
         // Trigger the death animation
         animator.SetTrigger("Die");
