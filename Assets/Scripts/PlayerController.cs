@@ -1,10 +1,8 @@
 using System.Collections;
-using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
-using UnityEditor.Callbacks;
 
 public class PlayerController : MonoBehaviour
 {
