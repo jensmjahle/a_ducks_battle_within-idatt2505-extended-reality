@@ -221,7 +221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   damageToPlayer: 2
-  damageInterval: 0.5
+  damageInterval: 5
   breadPrefab: {fileID: 644629139133929410, guid: eee4c9f49df93de48a0484083f66e4d2, type: 3}
   breadDropChance: 25
 --- !u!195 &6123897463708131191
