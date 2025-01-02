@@ -42,7 +42,7 @@ public class HealthManager : MonoBehaviour
     {
         healthAmount += healAmount;
         healthAmount = Mathf.Clamp(healthAmount, 0, 100);
-
+        
         healthBar.fillAmount = healthAmount / 100f;
     }
 }
