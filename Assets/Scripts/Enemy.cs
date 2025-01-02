@@ -6,7 +6,7 @@ using System.Collections;
 public class Enemy : MonoBehaviour
 {
     private int health = 100;
-    public float speed;
+    public float speed = 5;
     public int damageToPlayer = 2;
     public float damageInterval = 0.5f;
     private float damageTimer = 0f;
@@ -133,19 +133,25 @@ public class Enemy : MonoBehaviour
         // Periodically deal damage if touching the player
         if (isTouchingPlayer)
         {
-            damageTimer += Time.deltaTime;
-            if (damageTimer >= damageInterval)
-            {
-                damageTimer = 0f; // Reset the timer
+            if (damageTimer == 0f)
 
-                // Deal damage to the player
+            {
+                // Deal damage immediately
                 HealthManager playerHealth = player.GetComponent<HealthManager>();
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(damageToPlayer);
                 }
             }
+
+            damageTimer += Time.deltaTime;
+
+            if (damageTimer >= damageInterval)
+            {
+                damageTimer = 0f; // Reset the timer
+            }
         }
+
 
         if (player != null)
         {
