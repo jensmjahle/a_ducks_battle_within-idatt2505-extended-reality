@@ -1,65 +1,118 @@
-
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// GameManager class to manage the game state. This class will handle the rounds, score, and enemies.
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IDataPersistence
 {
     public static GameManager Instance;
 
+    // Fields to manage the game's state
     public int currentRound = 1;
     public int enemiesPerRound = 10;
     public int maxEnemies = 25;
-    public Text roundText;
-    public Text score;
     public int scoreValue = 0;
     public int totEnemiesKilled = 0;
     private int enemiesSpawned = 0;
     private int enemiesDefeated = 0;
+    public AudioSource audioSource; 
+
+    // New field to manage the current map
+    public string currentMap = "First Map";
+
+    // UI elements
+    public Text roundText;
+    public Text score;
 
     // Singleton pattern
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Ensure the GameManager persists across scenes
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // Start is called before the first frame update
     private void Start()
     {
+        // Retrieve the map from PlayerPrefs or use default
+        //LoadSelectedMap();
         UpdateRoundText();
     }
 
-    // Called when an enemy is spawned. Increment the counter
+    // --- Map Management ---
+
+    /// <summary>
+    /// Load the selected map from PlayerPrefs and set it as the current map.
+    /// </summary>
+    private void LoadSelectedMap()
+    {
+        currentMap = PlayerPrefs.GetString("SelectedMap", "First Map").Trim(); // Default to "First Map" if no map is saved
+        Debug.Log($"Loaded map: {currentMap}");
+
+        // Ensure the map exists in the build settings before loading
+        if (SceneExistsInBuildSettings(currentMap))
+        {
+            SceneManager.LoadScene(currentMap); // Load the map
+        }
+        else
+        {
+            Debug.LogError($"The map '{currentMap}' does not exist in Build Settings!");
+        }
+    }
+
+    /// <summary>
+    /// Checks if a given scene name exists in the build settings.
+    /// </summary>
+    private bool SceneExistsInBuildSettings(string sceneName)
+    {
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string loadedSceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            if (loadedSceneName == sceneName)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // --- Enemy Management ---
+
     public void OnEnemySpawned()
     {
         enemiesSpawned++;
     }
 
-    // Called when an enemy is defeated. Update the score and check if the round is complete
     public void OnEnemyDefeated()
     {
         enemiesDefeated++;
         UpdateScore(10); // Update the score when an enemy is defeated
         totEnemiesKilled++;
+
         if (enemiesDefeated >= enemiesPerRound)
         {
             StartCoroutine(WaitBeforeNextRound()); // Start the coroutine to wait before next round
         }
     }
 
-    // Start the next round by incrementing the enemies per round and resetting the counters
     private void StartNextRound()
     {
-        enemiesPerRound += 5; // Increment enemies per round.
+        currentRound++;
+        enemiesPerRound += 5; // Increment enemies per round
         enemiesSpawned = 0;
         enemiesDefeated = 0;
+        UpdateRoundText();
     }
 
+    // --- UI Updates ---
 
-    // Update the round text
     private void UpdateRoundText()
     {
         if (roundText != null && currentRound == 1)
@@ -72,7 +125,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Update the score text
     public void UpdateScore(int value)
     {
         if (score == null) return; // Check if the score text is assigned
@@ -80,23 +132,15 @@ public class GameManager : MonoBehaviour
         score.text = $"Score: {scoreValue}";
     }
 
-    // Coroutine to wait before starting the next round
+    // --- Coroutine for Round Text Fading ---
+
     private IEnumerator WaitBeforeNextRound()
     {
-        currentRound++;
-        UpdateRoundText(); // Update the round text
-        Debug.Log($"Round {currentRound} complete! Waiting 6 seconds...");
+        audioSource.Play(); // Play the level complete sound
         yield return new WaitForSeconds(6f); // Wait for 6 seconds
         StartNextRound();
     }
 
-    // Check if enemies can be spawned
-    public bool CanSpawnEnemy()
-    {
-        return enemiesSpawned < maxEnemies && enemiesSpawned < enemiesPerRound;
-    }
-
-    // Coroutine to fade the round text in and out
     private IEnumerator FadeRoundText()
     {
         float totalDuration = 6f; // Total time for the effect
@@ -132,12 +176,46 @@ public class GameManager : MonoBehaviour
         roundText.text = $"{currentRound}";
     }
 
-    // Helper method to change the alpha of the text
     private void SetTextAlpha(Text textComponent, float alpha)
     {
         Color color = textComponent.color;
         color.a = alpha;
         textComponent.color = color;
     }
-}
 
+    // --- IDataPersistence Implementation ---
+
+    public void LoadData(GameData data)
+    {
+        this.scoreValue = data.scoreValue;
+        this.currentRound = data.currentRound;
+        this.enemiesPerRound = data.enemiesPerRound;
+        this.maxEnemies = data.maxEnemies;
+        this.totEnemiesKilled = data.totEnemiesKilled;
+        this.enemiesSpawned = data.enemiesSpawned;
+        this.enemiesDefeated = data.enemiesDefeated;
+        this.currentMap = data.currentMap;
+
+        UpdateScore(0); // Trigger a UI update with the loaded score
+        UpdateRoundText();
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        data.scoreValue = this.scoreValue;
+        data.currentRound = this.currentRound;
+        data.enemiesPerRound = this.enemiesPerRound;
+        data.maxEnemies = this.maxEnemies;
+        data.totEnemiesKilled = this.totEnemiesKilled;
+        data.enemiesSpawned = this.enemiesSpawned;
+        data.enemiesDefeated = this.enemiesDefeated;
+        data.currentMap = this.currentMap;
+    }
+
+    // --- Helper Methods for Enemy Spawn Management ---
+
+    public bool CanSpawnEnemy()
+    {
+        return enemiesSpawned < maxEnemies && enemiesSpawned < enemiesPerRound;
+    }
+}

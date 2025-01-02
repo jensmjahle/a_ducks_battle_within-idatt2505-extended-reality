@@ -1,21 +1,25 @@
 using System.Collections;
-using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
     public Rigidbody2D rb;
     public GameObject projectilePrefab;
     public Transform firePoint;
+    private PauseGame pauseGame;
+    private InputAction pause;
+
+    private Dictionary<Vector2, Vector2> firePointOffsets; // Offsets for each direction
 
     // Prefab management
     public GameObject currentPlayerPrefab;
     private GameObject activePlayerInstance;
     private Animator baseAnimator; // The base animator (always running)
     private Animator[] overlayAnimators; // Array to store overlay animators (can be 1 or 2)
-
+    public AudioSource footstepAudioSource; 
 
     private PlayerPrefabManager prefabManager;
 
@@ -71,6 +75,22 @@ public class PlayerController : MonoBehaviour
                 _isMoving = value;
                 OnMovementChanged?.Invoke(); // Notify listeners when movement state changes
             }
+            // Toggle the footstep sound
+            if (_isMoving)
+            {
+                if (footstepAudioSource != null && !footstepAudioSource.isPlaying)
+                {
+                    footstepAudioSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+                    footstepAudioSource.Play();
+                }
+            }
+            else
+            {
+                if (footstepAudioSource != null && footstepAudioSource.isPlaying)
+                {
+                    footstepAudioSource.Stop();
+                }
+            }
         }
     }
     private Vector2 _lookDirection = Vector2.zero;
@@ -100,43 +120,63 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
-
-
-
+    
     private void Awake()
     {
         playerControls = new PlayerInputActions();
     }
 
-    void Start()
+void Start()
+{
+    // Retrieve and validate the PlayerPrefabManager component
+    prefabManager = GetComponent<PlayerPrefabManager>();
+    if (prefabManager == null)
     {
-
-        prefabManager = prefabManager = GetComponent<PlayerPrefabManager>();
-
-        currentColorVariant = ColorVariant.A; // Set the default color variant
-        _currentWeaponType = WeaponType.Pistol; // Set the default weapon type
-        _lookDirection = Vector2.down; // Set the default look direction
-
-        SwapPrefab(); // Swap the prefab based on the initial values
-
-        rb = GetComponent<Rigidbody2D>();
-
-        rb.linearDamping = 0;
-        rb.angularDamping = 0;
-
-        // Subscribe to events to trigger prefab swap when values change
-        OnShootingChanged += SetOverlayActive;
-        OnMovementChanged += SwapPrefab;
-        OnLookDirectionChanged += SwapPrefab;
-        OnWeaponChanged += SwapPrefab;
-
-        Debug.Log($"Overlay Animators Count: {overlayAnimators?.Length ?? 0}");
-
-
+        Debug.LogError("PlayerPrefabManager component is missing on this GameObject!");
+        return; // Exit Start to avoid further issues
     }
 
-    private void OnEnable() 
+    // Initialize default values
+    currentColorVariant = ColorVariant.A; // Set the default color variant
+    _currentWeaponType = WeaponType.Pistol; // Set the default weapon type
+    _lookDirection = Vector2.down; // Set the default look direction
+
+    // Perform the initial prefab swap
+    SwapPrefab();
+
+    // Retrieve and validate the Rigidbody2D component
+    rb = GetComponent<Rigidbody2D>();
+    if (rb == null)
+    {
+        Debug.LogError("Rigidbody2D component is missing on this GameObject!");
+        return; // Exit Start to avoid further issues
+    }
+
+    // Configure Rigidbody2D properties
+    rb.linearDamping = 0;
+    rb.angularDamping = 0;
+
+    // Ensure PauseGame script is assigned
+    pauseGame = FindObjectOfType<PauseGame>();
+    if (pauseGame == null)
+    {
+        Debug.LogError("PauseGame script is missing in the scene!");
+        return; // Exit Start to avoid further issues
+    }
+
+    // Subscribe to events to trigger prefab swap when values change
+    OnShootingChanged += SetOverlayActive;
+    OnMovementChanged += SwapPrefab;
+    OnLookDirectionChanged += SwapPrefab;
+    OnWeaponChanged += SwapPrefab;
+
+    // Debug log for overlay animators
+    Debug.Log($"Overlay Animators Count: {overlayAnimators?.Length ?? 0}");
+}
+
+
+
+    private void OnEnable()
     {
         move = playerControls.Player.Move;
         move.Enable();
@@ -147,6 +187,10 @@ public class PlayerController : MonoBehaviour
         fire = playerControls.Player.Fire;
         fire.Enable();
         fire.performed += OnFirePerformed;
+
+        pause = playerControls.Player.Pause;
+        pause.Enable();
+        pause.performed += OnPausePerformed;
     }
 
     private void OnDisable()
@@ -154,6 +198,7 @@ public class PlayerController : MonoBehaviour
         move.Disable();
         look.Disable();
         fire.Disable();
+        pause.Disable();
     }
 
     void Update()
@@ -228,23 +273,52 @@ public class PlayerController : MonoBehaviour
       Fire(); // Call the actual firing logic
   }
 
-      private void Fire()
-  {
-      // Instantiate the projectile
-      GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+    private void OnPausePerformed(InputAction.CallbackContext context)
+    {
+    if (pauseGame != null)
+    {
+        pauseGame.TogglePause();
+    }
+    else
+    {
+        Debug.LogError("PauseGame script is not assigned!");
+    }
+    }
+private void Fire()
+{
+    if (_lookDirection == Vector2.zero || firePoint == null )
+        return;
 
-      // Calculate the angle and set the rotation
-      float angle = Mathf.Atan2(_lookDirection.y, _lookDirection.x) * Mathf.Rad2Deg;
-      projectile.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 180));
+    // Determine the offset based on the look direction
+    Vector2 offset = Vector2.zero;
 
+    if (_lookDirection.x > 0) // Facing right
+        offset = new Vector2(1.0f, -0.5f);
+    else if (_lookDirection.x < 0) // Facing left
+        offset = new Vector2(-1.0f, -0.5f);
+    else if (_lookDirection.y > 0) // Facing up
+        offset = new Vector2(0f, 1.2f);
+    else if (_lookDirection.y < 0) // Facing down
+        offset = new Vector2(0f, -1.5f);
 
-      // Apply velocity to the projectile
-      Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-      if (rb != null)
-      {
-          rb.linearVelocity = _lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
-      }
-  }
+    // Update the firePoint position relative to the gun model
+    firePoint.position = (Vector2)transform.position + offset;
+
+    // Instantiate the projectile
+    GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+
+    // Calculate the angle and set the rotation
+    float angle = Mathf.Atan2(_lookDirection.y, _lookDirection.x) * Mathf.Rad2Deg;
+    projectile.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 180));
+
+    // Apply velocity to the projectile
+    Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+    if (rb != null)
+    {
+        rb.linearVelocity = _lookDirection.normalized * projectile.GetComponent<Projectile>().speed;
+    }
+}
+
 
 
     public void SwapPrefab()

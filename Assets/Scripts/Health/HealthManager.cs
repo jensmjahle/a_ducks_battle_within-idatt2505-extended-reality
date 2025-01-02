@@ -5,10 +5,10 @@ public class HealthManager : MonoBehaviour
 {
     public Image healthBar;
     public float healthAmount = 100f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+   
     void Start()
     {
-        
+       
     }
 
     // Update is called once per frame
@@ -35,6 +35,7 @@ public class HealthManager : MonoBehaviour
     {
         healthAmount -= damage;
         healthBar.fillAmount = healthAmount / 100f;
+      
     }
 
     public void Heal(float healAmount)
