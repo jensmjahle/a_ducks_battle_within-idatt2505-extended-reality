@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public int totEnemiesKilled = 0;
     private int enemiesSpawned = 0;
     private int enemiesDefeated = 0;
+    public AudioSource audioSource; 
 
     // New field to manage the current map
     public string currentMap = "First Map";
@@ -135,7 +136,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     private IEnumerator WaitBeforeNextRound()
     {
-        Debug.Log($"Round {currentRound} complete! Waiting 6 seconds...");
+        audioSource.Play(); // Play the level complete sound
         yield return new WaitForSeconds(6f); // Wait for 6 seconds
         StartNextRound();
     }
