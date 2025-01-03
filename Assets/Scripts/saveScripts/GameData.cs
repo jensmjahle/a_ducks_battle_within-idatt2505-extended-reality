@@ -11,6 +11,7 @@ public class GameData
     public int totEnemiesKilled;
     public int enemiesSpawned;
     public int enemiesDefeated;
+    public float playerHealth;
 
     // Default constructor initializes fields with default values
     public GameData()
@@ -23,5 +24,6 @@ public class GameData
         this.totEnemiesKilled = 0;
         this.enemiesSpawned = 0;
         this.enemiesDefeated = 0;
+        this.playerHealth = 100f;
     }
 }
