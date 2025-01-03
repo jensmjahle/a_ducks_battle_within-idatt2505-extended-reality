@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Ensure the GameManager persists across scenes
         }
         else
         {
@@ -187,28 +186,25 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     public void LoadData(GameData data)
     {
-        this.scoreValue = data.scoreValue;
+        // Apply loaded data to game objects
+        this.scoreValue = data.scoreValue; // Update the internal score value
+        if (this.score != null) // Ensure the Text component is not null
+        {
+            this.score.text = $"Score: {data.scoreValue}"; // Update the UI text
+        }
         this.currentRound = data.currentRound;
-        this.enemiesPerRound = data.enemiesPerRound;
-        this.maxEnemies = data.maxEnemies;
-        this.totEnemiesKilled = data.totEnemiesKilled;
-        this.enemiesSpawned = data.enemiesSpawned;
-        this.enemiesDefeated = data.enemiesDefeated;
         this.currentMap = data.currentMap;
+        this.currentRound = data.currentRound;
 
-        UpdateScore(0); // Trigger a UI update with the loaded score
-        UpdateRoundText();
+        Debug.Log("Game data applied: Score = " + scoreValue + ", Round = " + currentRound + ", Map = " + currentMap);
     }
+
 
     public void SaveData(ref GameData data)
     {
+        // Save current game state to data
         data.scoreValue = this.scoreValue;
         data.currentRound = this.currentRound;
-        data.enemiesPerRound = this.enemiesPerRound;
-        data.maxEnemies = this.maxEnemies;
-        data.totEnemiesKilled = this.totEnemiesKilled;
-        data.enemiesSpawned = this.enemiesSpawned;
-        data.enemiesDefeated = this.enemiesDefeated;
         data.currentMap = this.currentMap;
     }
 

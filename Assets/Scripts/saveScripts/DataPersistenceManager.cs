@@ -88,6 +88,8 @@ public class DataPersistenceManager : MonoBehaviour
         {
             dataPersistenceObj.LoadData(gameData);
         }
+
+        Debug.Log("Game data loaded successfully.");
     }
 
     public void SaveGame()
