@@ -60,14 +60,8 @@ If you want to build or modify the project:
    ```bash
    git clone https://github.com/your-repo/A-Ducks-Battle-Within.git
 
-    Open the project in Unity 2022.x.x or higher.
+    Open the project in Unity 6000.0.23f1 or higher.
     Play, modify, or build the project as needed.
-
-## Installation and execution
-### For Playthrough
-### Prerequisites
-### Installation
-### Running the repository
 
 ## **Usage**
 
