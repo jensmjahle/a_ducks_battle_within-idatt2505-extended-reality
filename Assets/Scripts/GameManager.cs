@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
     {
         // Apply loaded data to game objects
         this.scoreValue = data.scoreValue;
-        this.score.text = scoreValue.ToString();
+        UpdateScore(scoreValue);
         this.currentRound = data.currentRound;
         this.currentMap = data.currentMap;
         this.enemiesPerRound = data.enemiesPerRound;
