@@ -15,7 +15,7 @@ The game offers:
 ---
  ## Download the Game
 
- **Download the game [here](https://github.com/YourRepo/YourProject/releases/latest) to play**
+ **Download the game [here](https://github.com/jensmjahle/a_ducks_battle_within-idatt2505-extended-reality/releases/latest) to play**
 
 ---
 
