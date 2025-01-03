@@ -1,27 +1,98 @@
 # A Duck's Battle Within
-This is the final project for the course IDATT2505-Extended Reality at NTNU Trondheim created by Torbjørn Antonsen, Magnus Rindal and Jens Martin Jahle.
+_Final project for the course IDATT2505 - Extended Reality at NTNU Trondheim._  
+_Created by Torbjørn Antonsen, Magnus Rindal, and Jens Martin Jahle._
 
-## Description
-A Duck's Battle Within is a 2D top-down action game where 
-the player controls a duck fighting for survival against endless waves of enemies. As the game progresses,
-the enemies grow stronger and relentlessly pursue the player, creating an ever-increasing challenge. 
-The goal is to offer an intense and fast-paced experience where players must rely on their skills and strategy to survive for as long as possible.
+---
 
-## Visuals
-Bildær goes here! GIf!!!
+## **Description**
+**A Duck's Battle Within** is a 2D top-down action game where the player takes on the role of a duck fighting for survival against endless waves of enemies. As the game progresses, the enemies grow stronger and more relentless, demanding quick reflexes and strategic planning to outlast the onslaught.  
+
+The game offers:
+- **Fast-paced combat** with increasing difficulty.
+- **Skill-based survival mechanics** requiring precision and agility.
+- A **unique, duck-themed world** that adds a playful twist to the intensity of battle.
+
+---
+ ## Download the Game
+
+ **Download the game [here](https://github.com/YourRepo/YourProject/releases/latest) to play**
+
+---
+
+## **Visuals**
+_Add engaging screenshots or GIFs showcasing gameplay!_
+
+### Examples:
+- **Main Menu:** _(Screenshot of the main menu layout)_
+- **In-Game Action:** _(GIF or screenshot of intense battle moments)_
+- **Game Over Screen:** _(Display of the score and round results)_
+
+---
+
+## **Playthrough**
+Include a short, engaging video or step-by-step instructions on what a typical game session looks like:
+1. **Start** the game from the main menu.
+2. **Battle** waves of enemies while picking up items and improving your skills.
+3. **Survive** as long as possible and achieve a high score.
+4. Experience the **Game Over** screen that showcases your stats.
+
+---
+
+## **Installation and Execution**
+
+### **Prerequisites**
+- **Windows OS** (other platforms currently not supported).
+- At least **2GB of free disk space**.
+- **Unity runtime** (if needed, provide a link to download Unity dependencies).
+
+### **Installation**
+1. Download the game folder (e.g., ZIP file) from the [GitHub repository](#).
+2. Extract the files to a directory of your choice.
+3. Locate the executable file (`ADucksBattleWithin.exe`).
+
+### **Running the Game**
+1. Double-click `ADucksBattleWithin.exe` to launch the game.
+2. Enjoy!
+
+### **Running the Repository (Developers)**
+If you want to build or modify the project:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-repo/A-Ducks-Battle-Within.git
+
+    Open the project in Unity 2022.x.x or higher.
+    Play, modify, or build the project as needed.
 
 ## Installation and execution
+### For Playthrough
 ### Prerequisites
 ### Installation
 ### Running the repository
 
+## **Usage**
 
-## Usage
+### **Gameplay Controls**
+- **Movement:** Use `W`, `A`, `S`, and `D` to move the duck.  
+- **Attack:** Use `I`, `J`, `K`, and `L` to attack in different directions.  
+- **Pause Menu:** Press `Esc` to open the pause menu.
 
+### **Game Features**
+- **Bread Pickups:** Collect bread to heal during gameplay.  
+- **Enemy Waves:** Survive against progressively challenging enemies.  
+- **Score Tracking:** Monitor your score and rounds to beat your personal best.
 
-## Authors and acknowledgment
+---
 
-This project was made by the following students at NTNU:
-Torbjørn Antonsen,
-Magnus Rindal &
-Jens Martin Jahle
+## **Authors and Acknowledgments**
+
+### **Contributors**
+This project was developed as part of the course _IDATT2505 - Extended Reality_ at NTNU Trondheim.
+
+- **Torbjørn Antonsen**  
+- **Magnus Rindal**  
+- **Jens Martin Jahle**  
+
+### **Acknowledgments**
+Special thanks to:
+- Our course instructors for their guidance and feedback.  
+- Fellow students for playtesting and providing valuable suggestions.
