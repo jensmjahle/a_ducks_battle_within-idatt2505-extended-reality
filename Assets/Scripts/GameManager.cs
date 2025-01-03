@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         //LoadSelectedMap();
         UpdateRoundText();
     }
-
     // --- Map Management ---
 
     /// <summary>
@@ -187,25 +186,37 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public void LoadData(GameData data)
     {
         // Apply loaded data to game objects
-        this.scoreValue = data.scoreValue; // Update the internal score value
-        if (this.score != null) // Ensure the Text component is not null
-        {
-            this.score.text = $"Score: {data.scoreValue}"; // Update the UI text
-        }
+        this.scoreValue = data.scoreValue;
+        this.score.text = scoreValue.ToString();
         this.currentRound = data.currentRound;
         this.currentMap = data.currentMap;
-        this.currentRound = data.currentRound;
+        this.enemiesPerRound = data.enemiesPerRound;
+        this.maxEnemies = data.maxEnemies;
+        this.totEnemiesKilled = data.totEnemiesKilled;
+        this.enemiesSpawned = data.enemiesDefeated;
+        this.enemiesDefeated = data.enemiesDefeated;
 
-        Debug.Log("Game data applied: Score = " + scoreValue + ", Round = " + currentRound + ", Map = " + currentMap);
+        Debug.Log("Game data applied: Score = " + score + ", Round = " + currentRound + ", Map = " + currentMap);
     }
-
 
     public void SaveData(ref GameData data)
     {
         // Save current game state to data
+        if (enemiesDefeated >= enemiesPerRound)
+        {
+            StartNextRound();
+            data.currentRound = this.currentRound+1;
+        }
+        else
+        {
+            data.currentRound = this.currentRound;
+        }
         data.scoreValue = this.scoreValue;
-        data.currentRound = this.currentRound;
         data.currentMap = this.currentMap;
+        data.enemiesPerRound = this.enemiesPerRound;
+        data.maxEnemies = this.maxEnemies;
+        data.totEnemiesKilled = this.totEnemiesKilled;
+        data.enemiesDefeated = this.enemiesDefeated;
     }
 
     // --- Helper Methods for Enemy Spawn Management ---
