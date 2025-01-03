@@ -88,6 +88,8 @@ public class DataPersistenceManager : MonoBehaviour
         {
             dataPersistenceObj.LoadData(gameData);
         }
+
+        Debug.Log("Game data loaded successfully.");
     }
 
     public void SaveGame()
@@ -107,13 +109,10 @@ public class DataPersistenceManager : MonoBehaviour
         foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
         {
             dataPersistenceObj.SaveData(ref gameData);
-            
         }
 
         // Update the current map in gameData
         gameData.currentMap = SceneManager.GetActiveScene().name;
-
-        gameData.enemiesSpawned = 0;
 
         // Save the updated game data to the file
         dataHandler.Save(gameData, profileId);
