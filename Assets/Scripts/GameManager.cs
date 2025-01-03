@@ -102,11 +102,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     private void StartNextRound()
     {
-        currentRound++;
         enemiesPerRound += 5; // Increment enemies per round
         enemiesSpawned = 0;
         enemiesDefeated = 0;
-        UpdateRoundText();
     }
 
     // --- UI Updates ---
@@ -134,6 +132,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     private IEnumerator WaitBeforeNextRound()
     {
+        currentRound++;
+        UpdateRoundText();
         audioSource.Play(); // Play the level complete sound
         yield return new WaitForSeconds(6f); // Wait for 6 seconds
         StartNextRound();
