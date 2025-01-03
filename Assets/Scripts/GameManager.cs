@@ -204,8 +204,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
         // Save current game state to data
         if (enemiesDefeated >= enemiesPerRound)
         {
-            StartNextRound();
             data.currentRound = this.currentRound+1;
+            StartNextRound();
         }
         else
         {
