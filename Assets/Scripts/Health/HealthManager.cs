@@ -23,9 +23,22 @@ public class HealthManager : MonoBehaviour
 
     private static void Die()
     {
-        
         DefaultNamespace.GameOverGameData.CurrentRound = GameManager.Instance.currentRound;
         DefaultNamespace.GameOverGameData.Score = GameManager.Instance.scoreValue;
+        // Find the DataPersistenceManager instance in the scene
+        DataPersistenceManager dataPersistenceManager = FindObjectOfType<DataPersistenceManager>();
+        if (dataPersistenceManager != null)
+        {
+            // Delete the save file and game data
+            dataPersistenceManager.DeleteSaveFile();
+            dataPersistenceManager.NewGame();
+        }
+        else
+        {
+            Debug.LogError("DataPersistenceManager not found in the scene!");
+        }
+
+        // Load the GameOver scene
         SceneController.LoadScene("GameOver");
     }
 }

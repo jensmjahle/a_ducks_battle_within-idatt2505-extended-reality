@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Ensure the GameManager persists across scenes
         }
         else
         {
@@ -44,7 +43,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
         //LoadSelectedMap();
         UpdateRoundText();
     }
-
     // --- Map Management ---
 
     /// <summary>
@@ -104,11 +102,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     private void StartNextRound()
     {
-        currentRound++;
         enemiesPerRound += 5; // Increment enemies per round
         enemiesSpawned = 0;
         enemiesDefeated = 0;
-        UpdateRoundText();
     }
 
     // --- UI Updates ---
@@ -136,6 +132,8 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     private IEnumerator WaitBeforeNextRound()
     {
+        currentRound++;
+        UpdateRoundText();
         audioSource.Play(); // Play the level complete sound
         yield return new WaitForSeconds(6f); // Wait for 6 seconds
         StartNextRound();
@@ -187,29 +185,38 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     public void LoadData(GameData data)
     {
+        // Apply loaded data to game objects
         this.scoreValue = data.scoreValue;
+        UpdateScore(scoreValue);
         this.currentRound = data.currentRound;
+        this.currentMap = data.currentMap;
         this.enemiesPerRound = data.enemiesPerRound;
         this.maxEnemies = data.maxEnemies;
         this.totEnemiesKilled = data.totEnemiesKilled;
-        this.enemiesSpawned = data.enemiesSpawned;
+        this.enemiesSpawned = data.enemiesDefeated;
         this.enemiesDefeated = data.enemiesDefeated;
-        this.currentMap = data.currentMap;
 
-        UpdateScore(0); // Trigger a UI update with the loaded score
-        UpdateRoundText();
+        Debug.Log("Game data applied: Score = " + score + ", Round = " + currentRound + ", Map = " + currentMap);
     }
 
     public void SaveData(ref GameData data)
     {
+        // Save current game state to data
+        if (enemiesDefeated >= enemiesPerRound)
+        {
+            data.currentRound = this.currentRound+1;
+            StartNextRound();
+        }
+        else
+        {
+            data.currentRound = this.currentRound;
+        }
         data.scoreValue = this.scoreValue;
-        data.currentRound = this.currentRound;
+        data.currentMap = this.currentMap;
         data.enemiesPerRound = this.enemiesPerRound;
         data.maxEnemies = this.maxEnemies;
         data.totEnemiesKilled = this.totEnemiesKilled;
-        data.enemiesSpawned = this.enemiesSpawned;
         data.enemiesDefeated = this.enemiesDefeated;
-        data.currentMap = this.currentMap;
     }
 
     // --- Helper Methods for Enemy Spawn Management ---
