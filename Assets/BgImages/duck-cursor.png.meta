@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      duck-cursor_0: 3876672056083229817
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
