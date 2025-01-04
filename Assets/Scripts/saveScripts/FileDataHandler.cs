@@ -143,4 +143,85 @@ public class FileDataHandler
         }
     }
 
+    public void SaveHealth(HealthData data, string profileId)
+    {
+        if (profileId == null)
+        {
+            return;
+        }
+
+        string fullPath = Path.Combine(dataDirPath, profileId, dataFileName);
+
+        try
+        {
+            // Create the directory if it doesn't exist
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+
+            // Serialize the C# game data object into JSON
+            string dataToStore = JsonUtility.ToJson(data, true);
+
+            // Write the serialized data to the file
+            File.WriteAllText(fullPath, dataToStore);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error occurred when trying to save data to file: " + fullPath + "\n" + e);
+        }
+    }
+
+    public HealthData LoadHealth(string profileId)
+    {
+        if (profileId == null)
+        {
+            return null;
+        }
+
+        string fullPath = Path.Combine(dataDirPath, profileId, dataFileName);
+        HealthData loadedData = null;
+
+        if (File.Exists(fullPath))
+        {
+            try
+            {
+                // Load the serialized data from the file
+                string dataToLoad = File.ReadAllText(fullPath);
+
+                // Deserialize the data from JSON back into the C# object
+                loadedData = JsonUtility.FromJson<HealthData>(dataToLoad);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error occurred when trying to load file at path: " + fullPath + "\n" + e);
+            }
+        }
+
+        return loadedData;
+    }
+
+    public void DeleteHealth(string profileId)
+    {
+        if (profileId == null)
+        {
+            return;
+        }
+
+        string healthFileName = "healthdata.json";
+        string fullPath = Path.Combine(dataDirPath, profileId, "player",healthFileName);
+        try
+        {
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+            else
+            {
+                Debug.LogWarning("Tried to delete health data, but data was not found at path: " + fullPath);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Failed to delete health data for profileId: " + profileId + "\n" + e);
+        }
+    }
+
 }

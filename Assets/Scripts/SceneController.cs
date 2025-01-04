@@ -48,6 +48,9 @@ public class SceneController : MonoBehaviour
             case "MainMap":
                 SceneManager.LoadScene("MainMap");
                 break;
+            case "GameOver":
+                SceneManager.LoadScene("GameOver");
+                break;
             default:
                 Debug.LogWarning("Scene name not recognized: " + sceneName);
                 break;

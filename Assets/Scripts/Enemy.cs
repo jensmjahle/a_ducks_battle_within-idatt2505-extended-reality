@@ -22,9 +22,16 @@ public class Enemy : MonoBehaviour
     public float breadDropChance = 25f;
     public AudioSource playerHurtAudioSource;
     public AudioClip[] hurtClips;
+    private HealthManager _healthManager;
+
 
     void Start()
     {
+        GameObject healthManagerObject = GameObject.Find("HealthManager");
+        if (healthManagerObject != null)
+        {
+            _healthManager = healthManagerObject.GetComponent<HealthManager>();
+        }
         player = GameObject.FindWithTag("Player").transform;
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -137,10 +144,10 @@ public class Enemy : MonoBehaviour
 
             {
                 // Deal damage immediately
-                HealthManager playerHealth = player.GetComponent<HealthManager>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(damageToPlayer);
+                if(health -damageToPlayer > 0) {
+                    _healthManager.TakeDamage(damageToPlayer);
+                } else {
+                  //die
                 }
             }
 
