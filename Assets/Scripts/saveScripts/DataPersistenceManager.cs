@@ -157,6 +157,7 @@ public class DataPersistenceManager : MonoBehaviour
     public void DeleteSaveFile()
     {
         dataHandler.DeleteSaveFile(profileId);
+        dataHandler.DeleteHealth(profileId);
     }
 
     public string GetCurrentMap()

@@ -59,6 +59,7 @@ public class StartMap : MonoBehaviour
     public void StartAndDeleteSave()
     {
         dataPersistenceManager.DeleteSaveFile();
+        
         StartSelectedMap();
     }
 
