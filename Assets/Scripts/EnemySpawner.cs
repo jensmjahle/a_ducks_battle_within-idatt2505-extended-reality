@@ -6,7 +6,7 @@ public class EnemySpawner : MonoBehaviour
     public GameObject enemyPrefab;
     public Transform player;
     public float spawnDelay = 1f;
-    public float initialSpawnDelay = 5f; // Delay before the first enemy spawns
+    public float initialSpawnDelay = 3f; // Delay before the first enemy spawns
 
     private void Start()
     {

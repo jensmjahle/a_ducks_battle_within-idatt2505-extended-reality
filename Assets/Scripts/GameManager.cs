@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour, IDataPersistence
         currentRound++;
         UpdateRoundText();
         audioSource.Play(); // Play the level complete sound
-        yield return new WaitForSeconds(6f); // Wait for 6 seconds
+        yield return new WaitForSeconds(3f); // Wait for 3 seconds
         StartNextRound();
     }
 
@@ -204,13 +204,9 @@ public class GameManager : MonoBehaviour, IDataPersistence
         // Save current game state to data
         if (enemiesDefeated >= enemiesPerRound)
         {
-            data.currentRound = this.currentRound+1;
             StartNextRound();
         }
-        else
-        {
-            data.currentRound = this.currentRound;
-        }
+        data.currentRound = this.currentRound;
         data.scoreValue = this.scoreValue;
         data.currentMap = this.currentMap;
         data.enemiesPerRound = this.enemiesPerRound;
