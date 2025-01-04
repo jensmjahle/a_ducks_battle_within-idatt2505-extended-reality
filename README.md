@@ -20,22 +20,19 @@ The game offers:
 
 ---
 
-## **Visuals**
-_Add engaging screenshots or GIFs showcasing gameplay!_
 
-### Examples:
-- **Main Menu:** _(Screenshot of the main menu layout)_
-- **In-Game Action:** _(GIF or screenshot of intense battle moments)_
-- **Game Over Screen:** _(Display of the score and round results)_
+## **Visuals**
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6c8ed3d2-74fd-476d-96b3-c50bb4c0a2fd" alt="mainmenu-screen" width="300" style="margin: 10px;"/>
+  <img src="https://github.com/user-attachments/assets/046ed86c-cf23-44c5-910c-8fb33e5f729d" alt="ingame-screen" width="300" style="margin: 10px;"/>
+  <img src="https://github.com/user-attachments/assets/6fbe1c61-7b95-4ea3-a012-9c2797d0f49c" alt="gameover-screen" width="300" style="margin: 10px;"/>
+</p>
 
 ---
 
 ## **Playthrough**
-Include a short, engaging video or step-by-step instructions on what a typical game session looks like:
-1. **Start** the game from the main menu.
-2. **Battle** waves of enemies while picking up items and improving your skills.
-3. **Survive** as long as possible and achieve a high score.
-4. Experience the **Game Over** screen that showcases your stats.
+https://github.com/user-attachments/assets/810b210d-ae4e-4180-92eb-6ebe61eafa1d
+
 
 ---
 
