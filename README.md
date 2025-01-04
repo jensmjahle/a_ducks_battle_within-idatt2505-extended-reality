@@ -13,6 +13,7 @@ The game offers:
 - A **unique, duck-themed world** that adds a playful twist to the intensity of battle.
 
 ---
+
  ## Download the Game
 
  **Download the game [here](https://github.com/jensmjahle/a_ducks_battle_within-idatt2505-extended-reality/releases/latest) to play**
@@ -42,26 +43,19 @@ Include a short, engaging video or step-by-step instructions on what a typical g
 
 ### **Prerequisites**
 - **Windows OS** (other platforms currently not supported).
-- At least **2GB of free disk space**.
-- **Unity runtime** (if needed, provide a link to download Unity dependencies).
+- **Unity Editor 6000.0.23f1 or higher.** [click](https://unity.com/products/unity-engine).
 
 ### **Installation**
-1. Download the game folder (e.g., ZIP file) from the [GitHub repository](#).
+1. Download the game folder (e.g., ZIP file) from the [GitHub repository](https://github.com/jensmjahle/a_ducks_battle_within-idatt2505-extended-reality/archive/refs/heads/main.zip) or clone the repository with git.
+  ```bash
+   git clone https://github.com/jensmjahle/a_ducks_battle_within-idatt2505-extended-reality
+```
 2. Extract the files to a directory of your choice.
-3. Locate the executable file (`ADucksBattleWithin.exe`).
+3. Open Unity Hub.
+4. Select "add from disk" in the unity menu and navigate to the project folder.
+5. Open the project in Unity 6000.0.23f1 or higher.
+6. Play, modify, or build the project as needed.
 
-### **Running the Game**
-1. Double-click `ADucksBattleWithin.exe` to launch the game.
-2. Enjoy!
-
-### **Running the Repository (Developers)**
-If you want to build or modify the project:
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/A-Ducks-Battle-Within.git
-
-2. Open the project in Unity 6000.0.23f1 or higher.
-3. Play, modify, or build the project as needed.
 
 ## **Usage**
 
