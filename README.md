@@ -23,9 +23,9 @@ The game offers:
 
 ## **Visuals**
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/6c8ed3d2-74fd-476d-96b3-c50bb4c0a2fd" alt="mainmenu-screen" width="300" style="margin: 10px;"/>
-  <img src="https://github.com/user-attachments/assets/046ed86c-cf23-44c5-910c-8fb33e5f729d" alt="ingame-screen" width="300" style="margin: 10px;"/>
-  <img src="https://github.com/user-attachments/assets/6fbe1c61-7b95-4ea3-a012-9c2797d0f49c" alt="gameover-screen" width="300" style="margin: 10px;"/>
+  <img src="https://github.com/user-attachments/assets/6c8ed3d2-74fd-476d-96b3-c50bb4c0a2fd" alt="mainmenu-screen" width="350" style="margin: 10px;"/>
+  <img src="https://github.com/user-attachments/assets/046ed86c-cf23-44c5-910c-8fb33e5f729d" alt="ingame-screen" width="350" style="margin: 10px;"/>
+  <img src="https://github.com/user-attachments/assets/6fbe1c61-7b95-4ea3-a012-9c2797d0f49c" alt="gameover-screen" width="350" style="margin: 10px;"/>
 </p>
 
 ---
@@ -36,7 +36,8 @@ https://github.com/user-attachments/assets/810b210d-ae4e-4180-92eb-6ebe61eafa1d
 
 ---
 
-## **Installation and Execution**
+## **Installation and Execution (For Developers)**
+> **Note:** If you just want to play the game download the game instead further up.
 
 ### **Prerequisites**
 - **Windows OS** (other platforms currently not supported).
